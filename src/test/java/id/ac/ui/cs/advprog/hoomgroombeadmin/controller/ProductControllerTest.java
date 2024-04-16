@@ -26,13 +26,13 @@ public class ProductControllerTest {
 
     @Test
     public void createProductTest() throws Exception {
-        mvc.perform(get("/admin/product/create"))
+        mvc.perform(post("/admin/product/create"))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void updateProductPostTest() throws Exception {
-        mvc.perform(get("/admin/product/update/save"))
+        mvc.perform(post("/admin/product/update/save"))
                 .andExpect(status().isOk());
     }
 
@@ -46,7 +46,7 @@ public class ProductControllerTest {
     @Test
     public void deleteProductTest() throws Exception {
         UUID productId = new UUID(32, 10);
-        mvc.perform(get("/admin/product/delete/" + productId))
+        mvc.perform(post("/admin/product/delete/" + productId))
                 .andExpect(status().isOk());
     }
 
