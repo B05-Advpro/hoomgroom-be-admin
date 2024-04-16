@@ -1,0 +1,121 @@
+name: CI
+
+env:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  POSTGRES_DB: ${{ secrets.NAMA_DATABASE }}
+  POSTGRES_HOST: postgres
+  POSTGRES_PORT: 5432
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: my-password
+  REGISTRY_USER: ${{ secrets.REGISTRY_USER }}
+  IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
+  IMAGE_TAG: latest
+  CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+  GCP_USERNAME: ${{ secrets.GCP_USERNAME }}
+  GCP_STATIC_IP: ${{ secrets.GCP_STATIC_IP }}
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v2
+        with:
+          java-version: 21
+
+      - name: Set up Gradle
+        run: |
+          export GRADLE_USER_HOME=${{ github.workspace }}/.gradle
+
+      - name: Build with Gradle
+        run: |
+          ./gradlew assemble
+          ls
+
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: jar
+          path: build/libs/*.jar
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: build
+    services:
+      postgres:
+        image: postgres:latest
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: ${{ secrets.NAMA_DATABASE }}
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: my-password
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v2
+        with:
+          java-version: 21
+
+      - name: Set up Gradle
+        run: |
+          export GRADLE_USER_HOME=${{ github.workspace }}/.gradle
+          export SPRING_PROFILES_ACTIVE=test
+
+      - name: Run tests
+        run: |
+          gradle check --info --stacktrace
+          gradle test
+          gradle jacocoTestReport
+          grep -Eo "Total.*?([0-9]{1,3})%" build/jacocoHtml/index.html
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results
+          path: build/test-results/test/**/*.xml
+
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.REGISTRY_USER }} --password-stdin
+
+      - name: Build and push Docker image
+        run: |
+          docker build --build-arg PRODUCTION=$PRODUCTION --build-arg JDBC_DATABASE_PASSWORD=$JDBC_DATABASE_PASSWORD --build-arg JDBC_DATABASE_URL=$JDBC_DATABASE_URL --build-arg JDBC_DATABASE_USERNAME=$JDBC_DATABASE_USERNAME -t ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }} .
+          docker push ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }}
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: publish
+    steps:
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+
+      - name: Deploy to GCP
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ${{ secrets.SSH_KEY }} ${{ secrets.GCP_USERNAME }}@${{ secrets.GCP_STATIC_IP }} "
+            docker container rm -f ${{ secrets.CONTAINER_NAME }} || true &&
+            docker image rm -f ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }} || true &&
+            docker run --name ${{ secrets.CONTAINER_NAME }} -d -p 80:8080 ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }}"
