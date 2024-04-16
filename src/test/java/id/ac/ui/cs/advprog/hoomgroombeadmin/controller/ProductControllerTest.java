@@ -52,7 +52,7 @@ public class ProductControllerTest {
 
     @Test
     public void listProductTest() throws Exception {
-        mvc.perform(get("/product/list/"))
+        mvc.perform(get("/product/list"))
                 .andExpect(status().isOk());
     }
 }
