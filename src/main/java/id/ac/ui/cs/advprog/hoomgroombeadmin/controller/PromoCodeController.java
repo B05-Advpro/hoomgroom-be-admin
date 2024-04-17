@@ -12,26 +12,26 @@ public class PromoCodeController {
 
     @PostMapping("/admin/promo-code/create")
     public ResponseEntity<String> createPromoCodePost(Model model){
-        return ResponseEntity.ok("Hello, world!");
+        return ResponseEntity.ok().body("Hello, world!");
     }
 
     @PostMapping("/admin/promo-code/update/save")
     public ResponseEntity<String> updatePromoCodePost(Model model) {
-        return ResponseEntity.ok("Hello, world!");
+        return ResponseEntity.ok().body("Hello, world!");
     }
 
     @GetMapping("/admin/promo-code/update/{promoCodeId}")
     public ResponseEntity<String> updatePromoCodePage(@PathVariable UUID promoCodeId, Model model){
-        return ResponseEntity.ok("Hello, world!");
+        return ResponseEntity.ok().body("Hello, world!");
     }
 
     @PostMapping("/admin/promo-code/delete/{promoCodeId}")
     public ResponseEntity<String> deletePromoCode(@PathVariable UUID promoCodeId, Model model){
-        return ResponseEntity.ok("Hello, world!");
+        return ResponseEntity.ok().body("Hello, world!");
     }
 
     @GetMapping("/admin/promo-code/manage")
     public ResponseEntity<String> managePromoCode(Model model){
-        return ResponseEntity.ok("Hello, world!");
+        return ResponseEntity.ok().body("Hello, world!");
     }
 }
