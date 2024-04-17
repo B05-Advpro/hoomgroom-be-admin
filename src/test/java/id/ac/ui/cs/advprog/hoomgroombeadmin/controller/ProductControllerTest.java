@@ -39,14 +39,14 @@ public class ProductControllerTest {
     @Test
     public void updateProductPageTest() throws Exception {
         UUID productId = new UUID(32, 10);
-        mvc.perform(get("/admin/product/update/" + productId))
+        mvc.perform(get("/admin/product/update/" + productId.toString()))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void deleteProductTest() throws Exception {
         UUID productId = new UUID(32, 10);
-        mvc.perform(post("/admin/product/delete/" + productId))
+        mvc.perform(post("/admin/product/delete/" + productId.toString()))
                 .andExpect(status().isOk());
     }
 
