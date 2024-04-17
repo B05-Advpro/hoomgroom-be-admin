@@ -119,7 +119,7 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          name: java-app
+          name: jar
 
       - name: check directory
         run: ls -al
