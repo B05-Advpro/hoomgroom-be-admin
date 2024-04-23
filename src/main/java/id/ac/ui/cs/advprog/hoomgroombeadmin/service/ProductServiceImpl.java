@@ -16,7 +16,9 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public Product create(Product product) {
-        return null;
+        UUID productId = new UUID(32, 10);
+        product.setId(productId.toString());
+        return productRepository.save(product);
     }
 
     @Override
@@ -31,7 +33,7 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public List<Product> getAll() {
-        return null;
+        return productRepository.findAll();
     }
 
     @Override
