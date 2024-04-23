@@ -11,10 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.ArgumentMatchers.any;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -80,5 +77,55 @@ public class ProductServiceTest {
         assertTrue(savedProduct.getTag().contains("vintage"));
         assertTrue(savedProduct.getTag().contains("white"));
         assertTrue(savedProduct.getTag().contains("indoor"));
+    }
+
+    @Test
+    void testDelete(){
+        String productId = (new UUID(32, 10)).toString();
+        when(productRepository.existsById(productId)).thenReturn(true);
+
+        String result = service.delete(productId);
+        verify(productRepository,times(1)).existsById(productId);
+        verify(productRepository, times(1)).deleteById(productId);
+        assertEquals(productId, result);
+    }
+
+    @Test
+    void testDeleteIfIdNotFound(){
+        String productId = (new UUID(32, 10)).toString();
+        when(productRepository.existsById(productId)).thenReturn(false);
+
+        assertNull(service.delete(productId));
+        verify(productRepository,times(1)).existsById(productId);
+    }
+
+    @Test
+    void testGetProductByIdFound(){
+        product1.setId("eb558e9f-1c39-460e-8860-71af6af63bd6");
+        when(productRepository.existsById("eb558e9f-1c39-460e-8860-71af6af63bd6")).thenReturn(true);
+        when(productRepository.findById("eb558e9f-1c39-460e-8860-71af6af63bd6")).thenReturn(Optional.ofNullable(product1));
+
+        Product savedProduct = service.getProductById("eb558e9f-1c39-460e-8860-71af6af63bd6");
+
+        verify(productRepository,times(1)).existsById("eb558e9f-1c39-460e-8860-71af6af63bd6");
+        verify(productRepository,times(1)).findById("eb558e9f-1c39-460e-8860-71af6af63bd6");
+        assertEquals("eb558e9f-1c39-460e-8860-71af6af63bd6", savedProduct.getId());
+        assertEquals("Furniture 1", savedProduct.getProductName());
+        assertEquals("Good Furniture!", savedProduct.getDescription());
+        assertEquals("https://th.bing.com/th/id/R.9d24e1528d7ee3c412d6711744221414?rik=5X%2fhugoJOfiwDA&pid=ImgRaw&r=0",
+                savedProduct.getPicture());
+        assertEquals(1500000, savedProduct.getRealPrice());
+        assertEquals(1000000, savedProduct.getDiscPrice());
+        assertTrue(savedProduct.getTag().contains("vintage"));
+        assertTrue(savedProduct.getTag().contains("white"));
+        assertTrue(savedProduct.getTag().contains("indoor"));
+    }
+
+    @Test
+    void testGetProductByIdNotFound(){
+        when(productRepository.existsById("0000")).thenReturn(false);
+
+        assertNull(service.getProductById("0000"));
+        verify(productRepository,times(1)).existsById("0000");
     }
 }
