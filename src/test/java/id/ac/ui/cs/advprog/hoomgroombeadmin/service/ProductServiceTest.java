@@ -128,4 +128,40 @@ public class ProductServiceTest {
         assertNull(service.getProductById("0000"));
         verify(productRepository,times(1)).existsById("0000");
     }
+
+    @Test
+    void testEditIfIdFound(){
+        product1.setId("eb558e9f-1c39-460e-8860-71af6af63bd6");
+        List<String> tags = Arrays.asList("metal", "black", "outdoor");
+        product1.setProductName("Furniture 2");
+        product1.setTag(tags);
+        product1.setDescription("Awesome furniture for outdoor activities");
+        product1.setPicture("https://th.bing.com/th/id/OIP.jnxbSoE_kf3qaqH8LMDGzAHaHa?rs=1&pid=ImgDetMain");
+        product1.setRealPrice(2400000);
+        product1.setDiscPrice(2000000);
+
+        when(productRepository.save(product1)).thenReturn(product1);
+        when(productRepository.existsById("eb558e9f-1c39-460e-8860-71af6af63bd6")).thenReturn(true);
+        Product result = service.edit(product1);
+
+        verify(productRepository,times(1)).save(product1);
+        assertEquals(product1.getId(), result.getId());
+        assertEquals(product1.getProductName(), result.getProductName());
+        assertEquals(product1.getDescription(), result.getDescription());
+        assertEquals(product1.getPicture(), result.getPicture());
+        assertEquals(product1.getDiscPrice(), result.getDiscPrice());
+        assertEquals(product1.getRealPrice(), result.getRealPrice());
+        assertEquals(product1.getTag().getFirst(), product1.getTag().getFirst());
+        assertEquals(product1.getTag().getLast(), product1.getTag().getLast());
+    }
+
+    @Test
+    void testEditIfIdNotFound(){
+        Product product = new Product();
+        product.setId("11111");
+        when(productRepository.existsById("11111")).thenReturn(false);
+
+        assertNull(service.edit(product));
+        verify(productRepository, times(1)).existsById("11111");
+    }
 }
