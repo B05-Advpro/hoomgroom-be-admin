@@ -23,7 +23,11 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public Product edit(Product editedProduct) {
-        return null;
+        if (!productRepository.existsById(editedProduct.getId())){
+            return null;
+        }
+        productRepository.save(editedProduct);
+        return editedProduct;
     }
 
     @Override
