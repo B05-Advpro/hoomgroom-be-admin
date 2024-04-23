@@ -28,6 +28,9 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public Product getProductById(String productId) {
+        if (productRepository.existsById(productId)){
+            return productRepository.findById(productId).get();
+        }
         return null;
     }
 
@@ -38,6 +41,10 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public String delete(String productId) {
-        return null;
+        if (!productRepository.existsById(productId)){
+            return null;
+        }
+        productRepository.deleteById(productId);
+        return productId;
     }
 }
