@@ -3,6 +3,7 @@ package id.ac.ui.cs.advprog.hoomgroombeadmin.model;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 
@@ -19,10 +20,36 @@ public class Transaction {
     private String deliveryMethod;
 
     public Transaction(Map<UUID, Integer> products, String promoCodeUsed, UUID pembeli, String deliveryMethod) {
+        this.id = UUID.randomUUID();
 
+        if (products.isEmpty()) {
+            throw new IllegalArgumentException();
+        } else {
+            this.products = products;
+        }
+
+        this.promoCodeUsed = promoCodeUsed;
+        this.pembeli = pembeli;
+        this.deliveryStatus = "MENUNGGU VERIFIKASI";
+        this.deliveryCode = "";
+        this.setDeliveryMethod(deliveryMethod);
     }
 
     public void setDeliveryStatus(String status) {
+        String[] statusList = {"MENUNGGU VERIFIKASI", "DIPROSES", "DIKIRIM", "TIBA", "SELESAI"};
+        if (Arrays.stream(statusList).noneMatch(item -> (item.equals(status)))) {
+            throw new IllegalArgumentException();
+        } else {
+            this.deliveryStatus = status;
+        }
+    }
 
+    public void setDeliveryMethod(String method) {
+        String[] statusList = {"MOTOR", "TRUK", "PESAWAT"};
+        if (Arrays.stream(statusList).noneMatch(item -> (item.equals(method)))) {
+            throw new IllegalArgumentException();
+        } else {
+            this.deliveryMethod = method;
+        }
     }
 }
