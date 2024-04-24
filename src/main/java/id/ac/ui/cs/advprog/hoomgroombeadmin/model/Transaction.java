@@ -1,10 +1,10 @@
 package id.ac.ui.cs.advprog.hoomgroombeadmin.model;
 
+import id.ac.ui.cs.advprog.hoomgroombeadmin.enums.DeliveryMethod;
 import id.ac.ui.cs.advprog.hoomgroombeadmin.enums.DeliveryStatus;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 
@@ -45,11 +45,10 @@ public class Transaction {
     }
 
     public void setDeliveryMethod(String method) {
-        String[] statusList = {"MOTOR", "TRUK", "PESAWAT"};
-        if (Arrays.stream(statusList).noneMatch(item -> (item.equals(method)))) {
-            throw new IllegalArgumentException();
-        } else {
+        if (DeliveryMethod.contains(method)) {
             this.deliveryMethod = method;
+        } else {
+            throw new IllegalArgumentException();
         }
     }
 }
