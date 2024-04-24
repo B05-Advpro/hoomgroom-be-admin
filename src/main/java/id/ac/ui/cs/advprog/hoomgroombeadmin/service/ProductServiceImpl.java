@@ -32,10 +32,10 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public Product getProductById(String productId) {
-        if (productRepository.existsById(productId)){
-            return productRepository.findById(productId).get();
+        if (!productRepository.existsById(productId)){
+            return null;
         }
-        return null;
+        return productRepository.findById(productId).get();
     }
 
     @Override
