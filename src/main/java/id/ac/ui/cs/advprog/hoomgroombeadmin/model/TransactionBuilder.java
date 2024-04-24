@@ -14,18 +14,22 @@ public class TransactionBuilder {
 
     public TransactionBuilder setProducts(Map<UUID, Integer> products) {
         this.products = products;
+        return this;
     }
 
     public TransactionBuilder setPromoCodeUsed(String promoCodeUsed) {
         this.promoCodeUsed = promoCodeUsed;
+        return this;
     }
 
     public TransactionBuilder setPembeli(UUID pembeli) {
         this.pembeli = pembeli;
+        return this;
     }
 
     public TransactionBuilder setDeliveryMethod(String deliveryMethod) {
         this.deliveryMethod = deliveryMethod;
+        return this;
     }
 
     public Transaction build() {
