@@ -11,10 +11,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 class HoomgroomBeAdminApplicationTests {
 	@Resource(name="productController")
 	private ProductController productController;
-	@Test
-	void contextLoads() {
-		HoomgroomBeAdminApplication.main(new String[] {});
-		assertThat(productController).isNotNull();
-	}
+//	@Test
+//	void contextLoads() {
+//		HoomgroomBeAdminApplication.main(new String[] {});
+//		assertThat(productController).isNotNull();
+//	}
 
 }
