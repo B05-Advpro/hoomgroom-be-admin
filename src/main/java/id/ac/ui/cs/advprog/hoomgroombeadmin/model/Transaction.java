@@ -1,5 +1,6 @@
 package id.ac.ui.cs.advprog.hoomgroombeadmin.model;
 
+import id.ac.ui.cs.advprog.hoomgroombeadmin.enums.DeliveryStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,17 +31,16 @@ public class Transaction {
 
         this.promoCodeUsed = promoCodeUsed;
         this.pembeli = pembeli;
-        this.deliveryStatus = "MENUNGGU VERIFIKASI";
+        this.deliveryStatus = DeliveryStatus.MENUNGGU_VERIFIKASI.getValue();
         this.deliveryCode = "";
         this.setDeliveryMethod(deliveryMethod);
     }
 
     public void setDeliveryStatus(String status) {
-        String[] statusList = {"MENUNGGU VERIFIKASI", "DIPROSES", "DIKIRIM", "TIBA", "SELESAI"};
-        if (Arrays.stream(statusList).noneMatch(item -> (item.equals(status)))) {
-            throw new IllegalArgumentException();
-        } else {
+        if (DeliveryStatus.contains(status)) {
             this.deliveryStatus = status;
+        } else {
+            throw new IllegalArgumentException();
         }
     }
 

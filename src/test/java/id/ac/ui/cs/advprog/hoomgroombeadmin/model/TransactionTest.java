@@ -1,5 +1,6 @@
 package id.ac.ui.cs.advprog.hoomgroombeadmin.model;
 
+import id.ac.ui.cs.advprog.hoomgroombeadmin.enums.DeliveryStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -51,7 +52,7 @@ class TransactionTest {
 
     @Test
     void testGetDeliveryStatus() {
-        assertEquals("MENUNGGU VERIFIKASI", this.transaction.getDeliveryStatus());
+        assertEquals(DeliveryStatus.MENUNGGU_VERIFIKASI.getValue(), this.transaction.getDeliveryStatus());
     }
 
     @Test
