@@ -86,7 +86,7 @@ class TransactionTest {
                     .setProducts(this.products)
                     .setPromoCodeUsed("BELANJAHEMAT20")
                     .setPembeli(UUID.fromString("4f59c670-f83f-4d41-981f-37ee660a6e4c"))
-                    .setDeliveryMethod("MOTOR")
+                    .setDeliveryMethod("BECAK")
                     .build();
         });
     }
