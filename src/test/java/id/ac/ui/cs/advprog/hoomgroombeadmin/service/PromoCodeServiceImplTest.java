@@ -30,7 +30,6 @@ public class PromoCodeServiceImplTest {
     @BeforeEach
     void setUp() {
         promoCode1 = new PromoCode();
-        promoCode1.setCodeName("BELANJAHEMAT20");
         promoCode1.setEndDate(LocalDate.of(2024, 12, 31));
         promoCode1.setMinimumPayment((double)105000);
         promoCode1.setDescription("Diskon besar");
@@ -38,6 +37,7 @@ public class PromoCodeServiceImplTest {
 
     @Test
     void testCreateAndFindAll(){
+        promoCode1.setCodeName("BELANJAHEMAT20");
         when(promoCodeRepository.save(any(PromoCode.class))).thenReturn(promoCode1);
         service.create(promoCode1);
 
@@ -56,5 +56,78 @@ public class PromoCodeServiceImplTest {
         assertEquals(LocalDate.of(2024, 12, 31), savedPromoCode.getEndDate());
         assertEquals(105000, savedPromoCode.getMinimumPayment());
         assertEquals("Diskon besar", savedPromoCode.getDescription());
+    }
+
+    @Test
+    void testDelete(){
+        String promoCodeId = (new UUID(32, 10)).toString();
+        when(promoCodeRepository.existsById(promoCodeId)).thenReturn(true);
+
+        String result = service.delete(promoCodeId);
+        verify(promoCodeRepository, times(1)).existsById(promoCodeId);
+        verify(promoCodeRepository, times(1)).deleteById(promoCodeId);
+        assertEquals(promoCodeId, result);
+    }
+
+    @Test
+    void testDeleteIfIdNotFound(){
+        String promoCodeId = (new UUID(32, 10)).toString();
+        when(promoCodeRepository.existsById(promoCodeId)).thenReturn(false);
+
+        String result = service.delete(promoCodeId);
+        verify(promoCodeRepository, times(1)).existsById(promoCodeId);
+        assertNull(result);
+    }
+
+    @Test
+    void testGetProductByIdFound(){
+        promoCode1.setCodeName("BELANJAHEMAT30");
+        promoCode1.setCodeId("eb558e9f-1c39-460e-8860-71af6af63bd6");
+        when(promoCodeRepository.existsById("eb558e9f-1c39-460e-8860-71af6af63bd6")).thenReturn(true);
+        when(promoCodeRepository.findById("eb558e9f-1c39-460e-8860-71af6af63bd6")).thenReturn(Optional.ofNullable(promoCode1));
+
+        PromoCode savedPromoCode = service.getPromoCodeById("eb558e9f-1c39-460e-8860-71af6af63bd6");
+
+        verify(promoCodeRepository, times(1)).existsById(any(String.class));
+        verify(promoCodeRepository, times(1)).findById(any(String.class));
+        assertNotNull(savedPromoCode);
+        assertEquals("eb558e9f-1c39-460e-8860-71af6af63bd6", savedPromoCode.getCodeId());
+        assertEquals("BELANJAHEMAT30", savedPromoCode.getCodeName());
+    }
+
+    @Test
+    void testGetProductByIdNotFound(){
+        when(promoCodeRepository.existsById("0000")).thenReturn(false);
+
+        assertNull(service.getPromoCodeById("0000"));
+        verify(promoCodeRepository, times(1)).existsById("0000");
+    }
+
+    @Test
+    void testEditIfIdFound(){
+        PromoCode promoCode2 = new PromoCode();
+        promoCode2.setCodeId("7f4313b9-655b-4894-a88a-7f53937a1f84");
+        promoCode2.setCodeName("HEMAT40");
+        promoCode2.setEndDate(LocalDate.of(2024, 11, 30));
+        promoCode2.setMinimumPayment((double)5000);
+        promoCode2.setDescription("Diskon hebat");
+
+        when(promoCodeRepository.save(promoCode2)).thenReturn(promoCode2);
+        when(promoCodeRepository.existsById("7f4313b9-655b-4894-a88a-7f53937a1f84")).thenReturn(true);
+        PromoCode result = service.edit(promoCode2);
+
+        verify(promoCodeRepository, times(1)).save(promoCode2);
+        assertEquals(promoCode2.getCodeId(), result.getCodeId());
+        assertEquals(promoCode2.getCodeName(), result.getCodeName());
+    }
+
+    @Test
+    void testEditIfIdNotFound(){
+        PromoCode promoCode = new PromoCode();
+        promoCode.setCodeId("6e282868-9b5b-48a2-b509-0db4aa3615e6");
+        when(promoCodeRepository.existsById(any(String.class))).thenReturn(false);
+
+        assertNull(service.edit(promoCode));
+        verify(promoCodeRepository, times(1)).existsById(any(String.class));
     }
 }
