@@ -16,7 +16,9 @@ public class PromoCodeServiceImpl implements PromoCodeService{
 
     @Override
     public PromoCode create(PromoCode promoCode) {
-        return null;
+        UUID id = new UUID(32, 10);
+        promoCode.setCodeId(id.toString());
+        return promoCodeRepository.save(promoCode);
     }
 
     @Override
@@ -31,7 +33,7 @@ public class PromoCodeServiceImpl implements PromoCodeService{
 
     @Override
     public List<PromoCode> getAll() {
-        return null;
+        return promoCodeRepository.findAll();
     }
 
     @Override
