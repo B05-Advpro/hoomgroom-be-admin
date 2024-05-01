@@ -2,7 +2,7 @@ package id.ac.ui.cs.advprog.hoomgroombeadmin.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import id.ac.ui.cs.advprog.hoomgroombeadmin.controller.ProductController;
+import id.ac.ui.cs.advprog.hoomgroombeadmin.controller.ProductRestController;
 
 import id.ac.ui.cs.advprog.hoomgroombeadmin.model.Product;
 import id.ac.ui.cs.advprog.hoomgroombeadmin.service.ProductService;
@@ -35,7 +35,7 @@ public class ProductControllerTest {
     private ProductService productService;
 
     @InjectMocks
-    private ProductController controller;
+    private ProductRestController controller;
 
     ObjectMapper objectMapper = new ObjectMapper();
     Product product1;
