@@ -14,4 +14,5 @@ public class Product {
     private String picture;
     private double realPrice;
     private double discPrice;
+    private long sales;
 }
