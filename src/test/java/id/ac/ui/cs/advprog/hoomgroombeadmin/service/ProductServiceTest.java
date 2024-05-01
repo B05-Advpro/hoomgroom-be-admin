@@ -148,4 +148,159 @@ public class ProductServiceTest {
         assertNull(service.edit(product));
         verify(productRepository, times(1)).existsById("11111");
     }
+
+    @Test
+    void testFilterByLowestPriceIfAmountBigger(){
+        Product product2 = new Product();
+        List<String> tags1 = Arrays.asList("vintage", "white", "indoor");
+        product2.setProductName("Furniture 2");
+        product2.setTag(tags1);
+        product2.setDescription("Good Furniture!");
+        product2.setPicture("https://th.bing.com/th/id/R.9d24e1528d7ee3c412d6711744221414?rik=5X%2fhugoJOfiwDA&pid=ImgRaw&r=0");
+        product2.setRealPrice(1000000);
+        product2.setDiscPrice(1000000);
+
+        Product product3 = new Product();
+        product3.setProductName("Furniture 3");
+        product3.setTag(tags1);
+        product3.setDescription("Good Furniture!");
+        product3.setPicture("https://th.bing.com/th/id/R.9d24e1528d7ee3c412d6711744221414?rik=5X%2fhugoJOfiwDA&pid=ImgRaw&r=0");
+        product3.setRealPrice(2000000);
+        product3.setDiscPrice(1000000);
+
+        List<Product> products = Arrays.asList(product1, product2, product3);
+        when(productRepository.findAll()).thenReturn(products);
+
+        List<Product> result = service.getProductsByPrice(10, true);
+
+        assertNotNull(result);
+        assertEquals(3, result.size());
+        assertEquals(1000000, result.getFirst().getRealPrice());
+        assertEquals(2000000, result.getLast().getRealPrice());
+    }
+
+    @Test
+    void testFilterByHighestPriceIfAmountBigger(){
+        Product product2 = new Product();
+        List<String> tags1 = Arrays.asList("vintage", "white", "indoor");
+        product2.setProductName("Furniture 2");
+        product2.setTag(tags1);
+        product2.setDescription("Good Furniture!");
+        product2.setPicture("https://th.bing.com/th/id/R.9d24e1528d7ee3c412d6711744221414?rik=5X%2fhugoJOfiwDA&pid=ImgRaw&r=0");
+        product2.setRealPrice(1000000);
+        product2.setDiscPrice(1000000);
+
+        Product product3 = new Product();
+        product3.setProductName("Furniture 3");
+        product3.setTag(tags1);
+        product3.setDescription("Good Furniture!");
+        product3.setPicture("https://th.bing.com/th/id/R.9d24e1528d7ee3c412d6711744221414?rik=5X%2fhugoJOfiwDA&pid=ImgRaw&r=0");
+        product3.setRealPrice(2000000);
+        product3.setDiscPrice(1000000);
+
+        List<Product> products = Arrays.asList(product1, product2, product3);
+        when(productRepository.findAll()).thenReturn(products);
+
+        List<Product> result = service.getProductsByPrice(10, false);
+
+        assertNotNull(result);
+        assertEquals(3, result.size());
+        assertEquals(2000000, result.getFirst().getRealPrice());
+        assertEquals(1000000, result.getLast().getRealPrice());
+    }
+
+    @Test
+    void testFilterLowestPriceIfAmountSmaller() {
+        Product product2 = new Product();
+        product2.setRealPrice(1000000);
+
+        Product product3 = new Product();
+        product3.setRealPrice(1500000);
+
+        Product product4 = new Product();
+        product4.setRealPrice(3000000);
+
+        Product product5 = new Product();
+        product5.setRealPrice(2000000);
+
+        Product product6 = new Product();
+        product6.setRealPrice(5000000);
+
+        Product product7 = new Product();
+        product7.setRealPrice(2500000);
+
+        Product product8 = new Product();
+        product8.setRealPrice(900000);
+
+        Product product9 = new Product();
+        product9.setRealPrice(3500000);
+
+        Product product10 = new Product();
+        product10.setRealPrice(4000000);
+
+        Product product11 = new Product();
+        product11.setRealPrice(5500000);
+
+        List<Product> products = Arrays.asList(product1, product2, product3,
+                product4, product5, product6, product7, product8, product9, product10, product11);
+        when(productRepository.findAll()).thenReturn(products);
+
+        List<Product> result = service.getProductsByPrice(8, true);
+        assertEquals(8, result.size());
+        assertEquals(900000, result.getFirst().getRealPrice());
+        assertEquals(1000000, result.get(1).getRealPrice());
+        assertEquals(3500000, result.getLast().getRealPrice());
+    }
+
+    @Test
+    void testFilterHighestPriceIfAmountSmaller(){
+        Product product2 = new Product();
+        product2.setRealPrice(1000000);
+
+        Product product3 = new Product();
+        product3.setRealPrice(1500000);
+
+        Product product4 = new Product();
+        product4.setRealPrice(3000000);
+
+        Product product5 = new Product();
+        product5.setRealPrice(2000000);
+
+        Product product6 = new Product();
+        product6.setRealPrice(5000000);
+
+        Product product7 = new Product();
+        product7.setRealPrice(2500000);
+
+        Product product8 = new Product();
+        product8.setRealPrice(900000);
+
+        Product product9 = new Product();
+        product9.setRealPrice(3500000);
+
+        Product product10 = new Product();
+        product10.setRealPrice(4000000);
+
+        Product product11 = new Product();
+        product11.setRealPrice(5500000);
+
+        List<Product> products = Arrays.asList(product1, product2, product3,
+                product4, product5, product6, product7, product8, product9, product10, product11);
+        when(productRepository.findAll()).thenReturn(products);
+
+        List<Product> result = service.getProductsByPrice(8, false);
+        assertEquals(8, result.size());
+        assertEquals(5500000, result.getFirst().getRealPrice());
+        assertEquals(5000000, result.get(1).getRealPrice());
+        assertEquals(1500000, result.getLast().getRealPrice());
+    }
+
+    @Test
+    void testFilterIfEmpty(){
+        when(productRepository.findAll()).thenReturn(new ArrayList<Product>());
+        List<Product> result = service.getProductsByPrice(10, false);
+
+        assertNotNull(result);
+        assertEquals(0, result.size());
+    }
 }
