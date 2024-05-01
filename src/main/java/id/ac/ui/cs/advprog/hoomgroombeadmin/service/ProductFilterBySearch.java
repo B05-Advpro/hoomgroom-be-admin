@@ -8,4 +8,10 @@ import java.util.stream.Collectors;
 
 public class ProductFilterBySearch implements ProductFilterStrategy{
 
+    @Override
+    List<Product> sort(List<Product> products, String keyword) {
+        return products.stream()
+                .filter(product -> product.getProductName().toLowerCase().contains(keyword.toLowerCase()))
+                .collect(Collectors.toList());
+    }
 }
