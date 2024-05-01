@@ -20,6 +20,7 @@ class ProductTest{
         this.product.setPicture("https://th.bing.com/th/id/R.9d24e1528d7ee3c412d6711744221414?rik=5X%2fhugoJOfiwDA&pid=ImgRaw&r=0");
         this.product.setRealPrice(1500000);
         this.product.setDiscPrice(1000000);
+        this.product.setSales(1);
     }
 
     @Test
@@ -60,4 +61,8 @@ class ProductTest{
         assertEquals(1000000, this.product.getDiscPrice());
     }
 
+    @Test
+    void testGetSales(){
+        assertEquals(1, this.product.getSales());
+    }
 }

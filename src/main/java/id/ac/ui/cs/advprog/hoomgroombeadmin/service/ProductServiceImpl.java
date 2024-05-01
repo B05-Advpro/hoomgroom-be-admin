@@ -20,6 +20,7 @@ public class ProductServiceImpl implements ProductService{
     public Product create(Product product) {
         UUID productId = new UUID(32, 10);
         product.setId(productId.toString());
+        product.setSales(0);
         return productRepository.save(product);
     }
 

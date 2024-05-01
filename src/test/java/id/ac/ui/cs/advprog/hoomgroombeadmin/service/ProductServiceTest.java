@@ -61,6 +61,7 @@ public class ProductServiceTest {
         assertTrue(savedProduct.getTag().contains("vintage"));
         assertTrue(savedProduct.getTag().contains("white"));
         assertTrue(savedProduct.getTag().contains("indoor"));
+        assertEquals(0L, savedProduct.getSales());
     }
 
     @Test
