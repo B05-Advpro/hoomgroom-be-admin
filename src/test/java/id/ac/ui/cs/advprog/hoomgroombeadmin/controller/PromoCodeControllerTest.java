@@ -39,14 +39,14 @@ public class PromoCodeControllerTest {
     @Test
     public void updatePromoCodePageTest() throws Exception {
         UUID promoCodeId = new UUID(32, 10);
-        mvc.perform(get("/admin/promo-code/update/" + promoCodeId))
+        mvc.perform(get("/admin/promo-code/update/" + promoCodeId.toString()))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void deletePromoCodeTest() throws Exception {
         UUID promoCodeId = new UUID(32, 10);
-        mvc.perform(post("/admin/promo-code/delete/" + promoCodeId))
+        mvc.perform(post("/admin/promo-code/delete/" + promoCodeId.toString()))
                 .andExpect(status().isOk());
     }
 
