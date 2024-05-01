@@ -23,12 +23,19 @@ public class PromoCodeServiceImpl implements PromoCodeService{
 
     @Override
     public PromoCode edit(PromoCode editedPromoCode) {
-        return null;
+        if (!promoCodeRepository.existsById(editedPromoCode.getCodeId())){
+            return null;
+        }
+        promoCodeRepository.save(editedPromoCode);
+        return editedPromoCode;
     }
 
     @Override
     public PromoCode getPromoCodeById(String promoCodeId) {
-        return null;
+        if (!promoCodeRepository.existsById(promoCodeId)){
+            return null;
+        }
+        return promoCodeRepository.findById(promoCodeId).get();
     }
 
     @Override
@@ -38,6 +45,10 @@ public class PromoCodeServiceImpl implements PromoCodeService{
 
     @Override
     public String delete(String promoCodeId) {
-        return null;
+        if (!promoCodeRepository.existsById(promoCodeId)){
+            return null;
+        }
+        promoCodeRepository.deleteById(promoCodeId);
+        return promoCodeId;
     }
 }
