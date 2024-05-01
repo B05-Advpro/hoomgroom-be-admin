@@ -54,9 +54,14 @@ public class ProductServiceImpl implements ProductService{
         return productId;
     }
 
+    /* Will return empty list if there are no products found
+    amount: the number of products that will be returned in the list
+    fromLowest: true when you want to sort price from lowest
+    */
     public List<Product> getProductsByPrice(int amount, boolean fromLowest){
         filterContext.setStrategy(new ProductFilterByPrice());
         List<Product> sortedbyPrice = filterContext.executeStrategy(productRepository.findAll());
+
         if (amount > sortedbyPrice.size()){
             if (fromLowest) return sortedbyPrice;
             else return sortedbyPrice.reversed();
