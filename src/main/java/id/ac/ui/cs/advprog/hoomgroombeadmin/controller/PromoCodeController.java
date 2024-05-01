@@ -5,8 +5,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
 @Controller
 public class PromoCodeController {
 
@@ -21,12 +19,12 @@ public class PromoCodeController {
     }
 
     @GetMapping("/admin/promo-code/update/{promoCodeId}")
-    public ResponseEntity<String> updatePromoCodePage(@PathVariable UUID promoCodeId, Model model){
+    public ResponseEntity<String> updatePromoCodePage(@PathVariable String promoCodeId, Model model){
         return ResponseEntity.ok().body("Hello, world!");
     }
 
     @PostMapping("/admin/promo-code/delete/{promoCodeId}")
-    public ResponseEntity<String> deletePromoCode(@PathVariable UUID promoCodeId, Model model){
+    public ResponseEntity<String> deletePromoCode(@PathVariable String promoCodeId, Model model){
         return ResponseEntity.ok().body("Hello, world!");
     }
 
