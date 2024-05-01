@@ -152,21 +152,10 @@ public class ProductServiceTest {
     @Test
     void testFilterByLowestPriceIfAmountBigger(){
         Product product2 = new Product();
-        List<String> tags1 = Arrays.asList("vintage", "white", "indoor");
-        product2.setProductName("Furniture 2");
-        product2.setTag(tags1);
-        product2.setDescription("Good Furniture!");
-        product2.setPicture("https://th.bing.com/th/id/R.9d24e1528d7ee3c412d6711744221414?rik=5X%2fhugoJOfiwDA&pid=ImgRaw&r=0");
         product2.setRealPrice(1000000);
-        product2.setDiscPrice(1000000);
 
         Product product3 = new Product();
-        product3.setProductName("Furniture 3");
-        product3.setTag(tags1);
-        product3.setDescription("Good Furniture!");
-        product3.setPicture("https://th.bing.com/th/id/R.9d24e1528d7ee3c412d6711744221414?rik=5X%2fhugoJOfiwDA&pid=ImgRaw&r=0");
         product3.setRealPrice(2000000);
-        product3.setDiscPrice(1000000);
 
         List<Product> products = Arrays.asList(product1, product2, product3);
         when(productRepository.findAll()).thenReturn(products);
@@ -182,21 +171,10 @@ public class ProductServiceTest {
     @Test
     void testFilterByHighestPriceIfAmountBigger(){
         Product product2 = new Product();
-        List<String> tags1 = Arrays.asList("vintage", "white", "indoor");
-        product2.setProductName("Furniture 2");
-        product2.setTag(tags1);
-        product2.setDescription("Good Furniture!");
-        product2.setPicture("https://th.bing.com/th/id/R.9d24e1528d7ee3c412d6711744221414?rik=5X%2fhugoJOfiwDA&pid=ImgRaw&r=0");
         product2.setRealPrice(1000000);
-        product2.setDiscPrice(1000000);
 
         Product product3 = new Product();
-        product3.setProductName("Furniture 3");
-        product3.setTag(tags1);
-        product3.setDescription("Good Furniture!");
-        product3.setPicture("https://th.bing.com/th/id/R.9d24e1528d7ee3c412d6711744221414?rik=5X%2fhugoJOfiwDA&pid=ImgRaw&r=0");
         product3.setRealPrice(2000000);
-        product3.setDiscPrice(1000000);
 
         List<Product> products = Arrays.asList(product1, product2, product3);
         when(productRepository.findAll()).thenReturn(products);
