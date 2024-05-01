@@ -14,6 +14,8 @@ public class ProductServiceImpl implements ProductService{
     @Autowired
     private ProductRepository productRepository;
 
+    private final ProductFilterContext filterContext = new ProductFilterContext(null);
+
     @Override
     public Product create(Product product) {
         UUID productId = new UUID(32, 10);
@@ -50,5 +52,19 @@ public class ProductServiceImpl implements ProductService{
         }
         productRepository.deleteById(productId);
         return productId;
+    }
+
+    public List<Product> getProductsByPrice(int amount, boolean fromLowest){
+        filterContext.setStrategy(new ProductFilterByPrice());
+        List<Product> sortedbyPrice = filterContext.executeStrategy(productRepository.findAll());
+        if (amount > sortedbyPrice.size()){
+            if (fromLowest) return sortedbyPrice;
+            else return sortedbyPrice.reversed();
+        }
+        if (fromLowest) {
+            return sortedbyPrice.subList(0, amount);
+        } else {
+            return sortedbyPrice.reversed().subList(0, amount);
+        }
     }
 }
