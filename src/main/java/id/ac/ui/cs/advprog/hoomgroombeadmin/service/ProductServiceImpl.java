@@ -73,4 +73,20 @@ public class ProductServiceImpl implements ProductService{
             return sortedbyPrice.reversed().subList(0, amount);
         }
     }
+
+    public List<Product> getProductsBySearched(int amount, boolean fromLowest ){
+        filterContext.setStrategy(new ProductFilterByPrice());
+        List<Product> sortedbyPrice = filterContext.executeStrategy(productRepository.findAll());
+
+        if (amount > sortedbyPrice.size()){
+            if (fromLowest) return sortedbyPrice;
+            else return sortedbyPrice.reversed();
+        }
+        if (fromLowest) {
+            return sortedbyPrice.subList(0, amount);
+        } else {
+            return sortedbyPrice.reversed().subList(0, amount);
+        }
+    }
+
 }
