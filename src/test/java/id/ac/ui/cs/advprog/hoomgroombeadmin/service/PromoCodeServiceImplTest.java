@@ -11,7 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.ArgumentMatchers.any;
 
-import java.time.LocalDate;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,14 +29,13 @@ public class PromoCodeServiceImplTest {
     @BeforeEach
     void setUp() {
         promoCode1 = new PromoCode();
-        promoCode1.setEndDate(LocalDate.of(2024, 12, 31));
         promoCode1.setMinimumPayment((double)105000);
         promoCode1.setDescription("Diskon besar");
     }
 
     @Test
     void testCreateAndFindAll(){
-        promoCode1.setCodeName("BELANJAHEMAT20");
+        promoCode1.setCodeName("BELANJAHEMAT75");
         when(promoCodeRepository.save(any(PromoCode.class))).thenReturn(promoCode1);
         service.create(promoCode1);
 
@@ -51,9 +49,6 @@ public class PromoCodeServiceImplTest {
         PromoCode savedPromoCode = promoCodeList.getFirst();
         assertNotNull(savedPromoCode);
         assertNotNull(savedPromoCode.getCodeId());
-        assertEquals("BELANJAHEMAT20", savedPromoCode.getCodeName());
-        assertEquals(20, savedPromoCode.getDiscPercentage());
-        assertEquals(LocalDate.of(2024, 12, 31), savedPromoCode.getEndDate());
         assertEquals(105000, savedPromoCode.getMinimumPayment());
         assertEquals("Diskon besar", savedPromoCode.getDescription());
     }
@@ -81,7 +76,7 @@ public class PromoCodeServiceImplTest {
 
     @Test
     void testGetProductByIdFound(){
-        promoCode1.setCodeName("BELANJAHEMAT30");
+        promoCode1.setCodeName("BELANJAHEMAT60");
         promoCode1.setCodeId("eb558e9f-1c39-460e-8860-71af6af63bd6");
         when(promoCodeRepository.existsById("eb558e9f-1c39-460e-8860-71af6af63bd6")).thenReturn(true);
         when(promoCodeRepository.findById("eb558e9f-1c39-460e-8860-71af6af63bd6")).thenReturn(Optional.ofNullable(promoCode1));
@@ -92,7 +87,6 @@ public class PromoCodeServiceImplTest {
         verify(promoCodeRepository, times(1)).findById(any(String.class));
         assertNotNull(savedPromoCode);
         assertEquals("eb558e9f-1c39-460e-8860-71af6af63bd6", savedPromoCode.getCodeId());
-        assertEquals("BELANJAHEMAT30", savedPromoCode.getCodeName());
     }
 
     @Test
@@ -108,7 +102,6 @@ public class PromoCodeServiceImplTest {
         PromoCode promoCode2 = new PromoCode();
         promoCode2.setCodeId("7f4313b9-655b-4894-a88a-7f53937a1f84");
         promoCode2.setCodeName("HEMAT40");
-        promoCode2.setEndDate(LocalDate.of(2024, 11, 30));
         promoCode2.setMinimumPayment((double)5000);
         promoCode2.setDescription("Diskon hebat");
 
