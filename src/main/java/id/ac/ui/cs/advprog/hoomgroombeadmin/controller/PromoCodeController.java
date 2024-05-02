@@ -1,6 +1,5 @@
 package id.ac.ui.cs.advprog.hoomgroombeadmin.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import id.ac.ui.cs.advprog.hoomgroombeadmin.model.PromoCode;
 import id.ac.ui.cs.advprog.hoomgroombeadmin.service.PromoCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
