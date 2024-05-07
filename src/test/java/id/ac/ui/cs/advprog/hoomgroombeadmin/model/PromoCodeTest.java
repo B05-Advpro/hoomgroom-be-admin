@@ -2,15 +2,10 @@ package id.ac.ui.cs.advprog.hoomgroombeadmin.model;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 
 import static org.junit.jupiter.api.Assertions.*;
-import java.util.List;
-import java.util.Arrays;
+
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 public class PromoCodeTest {
     PromoCode validPromoCode;

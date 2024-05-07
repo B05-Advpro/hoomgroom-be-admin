@@ -18,8 +18,6 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public Product create(Product product) {
-        UUID productId = new UUID(32, 10);
-        product.setId(productId.toString());
         return productRepository.save(product);
     }
 
@@ -72,4 +70,39 @@ public class ProductServiceImpl implements ProductService{
             return sortedbyPrice.reversed().subList(0, amount);
         }
     }
+
+    public List<Product> getProductsBySearched(int amount, boolean fromLowest ){
+        filterContext.setStrategy(new ProductFilterByPrice());
+        List<Product> sortedByPrice = filterContext.executeStrategy(productRepository.findAll());
+
+        if (amount > sortedByPrice.size()){
+            if (fromLowest) return sortedByPrice;
+            else return sortedByPrice.reversed();
+        }
+        if (fromLowest) {
+            return sortedByPrice.subList(0, amount);
+        } else {
+            return sortedByPrice.reversed().subList(0, amount);
+        }
+    }
+
+    /* Will return empty list if there are no products found
+    amount: the number of products that will be returned in the list
+    fromLowest: true when you want to sort price from lowest
+    */
+    public List<Product> getProductsBySales(int amount, boolean fromLowest){
+        filterContext.setStrategy(new ProductFilterBySales());
+        List<Product> sortedBySales = filterContext.executeStrategy(productRepository.findAll());
+
+        if (amount > sortedBySales.size()){
+            if (fromLowest) return sortedBySales;
+            else return sortedBySales.reversed();
+        }
+        if (fromLowest) {
+            return sortedBySales.subList(0, amount);
+        } else {
+            return sortedBySales.reversed().subList(0, amount);
+        }
+    }
+
 }
