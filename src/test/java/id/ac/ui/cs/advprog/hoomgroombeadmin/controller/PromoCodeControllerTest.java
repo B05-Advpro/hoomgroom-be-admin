@@ -116,7 +116,7 @@ public class PromoCodeControllerTest {
         String expectedResult = "Deleted promo code with ID " + promoCodeId;
         when(service.delete(promoCodeId.toString())).thenReturn(promoCodeId.toString());
 
-        mvc.perform(post("/admin/promo-code/delete/" + promoCodeId.toString()))
+        mvc.perform(delete("/admin/promo-code/delete/" + promoCodeId.toString()))
                 .andExpect(status().isOk())
                 .andDo(result -> {String responseBody = result.getResponse().getContentAsString();
                 assertEquals(expectedResult, responseBody);

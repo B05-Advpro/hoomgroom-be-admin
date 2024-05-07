@@ -123,7 +123,7 @@ public class ProductControllerTest {
         UUID productId = new UUID(32, 10);
         String expectedResult = "Deleted product with ID " + productId;
         when(productService.delete(productId.toString())).thenReturn(productId.toString());
-        mvc.perform(post("/admin/product/delete/" + productId.toString()))
+        mvc.perform(delete("/admin/product/delete/" + productId.toString()))
                 .andExpect(status().isOk())
                 .andDo(result -> {String responseBody = result.getResponse().getContentAsString();
                 assertEquals(expectedResult, responseBody);});
@@ -132,7 +132,7 @@ public class ProductControllerTest {
     @Test
     public void listProductTest() throws Exception {
         when(productService.getAll()).thenReturn(Arrays.asList(product1));
-        mvc.perform(get("/product/list"))
+        mvc.perform(get("/admin/product/list"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andDo(result -> {List<Product> products = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<List<Product>>() {});
