@@ -275,6 +275,102 @@ public class ProductServiceTest {
         assertEquals(1500000, result.getLast().getRealPrice());
     }
 
+    @Test
+    void testFilterByLowestSalesIfAmountBigger(){
+        product1.setSales(30);
+
+        Product product2 = new Product();
+        product2.setSales(100);
+
+        Product product3 = new Product();
+        product3.setSales(50);
+
+        List<Product> products = Arrays.asList(product1, product2, product3);
+        when(productRepository.findAll()).thenReturn(products);
+
+        List<Product> result = service.getProductsBySales(10, true);
+
+        assertNotNull(result);
+        assertEquals(3, result.size());
+        assertEquals(30, result.getFirst().getSales());
+        assertEquals(100, result.getLast().getSales());
+    }
+
+    @Test
+    void testFilterByHighestSalesIfAmountBigger(){
+        product1.setSales(30);
+
+        Product product2 = new Product();
+        product2.setSales(100);
+
+        Product product3 = new Product();
+        product3.setSales(50);
+
+        List<Product> products = Arrays.asList(product1, product2, product3);
+        when(productRepository.findAll()).thenReturn(products);
+
+        List<Product> result = service.getProductsBySales(10, false);
+
+        assertNotNull(result);
+        assertEquals(3, result.size());
+        assertEquals(100, result.getFirst().getSales());
+        assertEquals(30, result.getLast().getSales());
+    }
+
+    @Test
+    void testFilterByHighestSalesIfAmountSmaller(){
+        product1.setSales(30);
+
+        Product product2 = new Product();
+        product2.setSales(100);
+
+        Product product3 = new Product();
+        product3.setSales(50);
+
+        Product product4 = new Product();
+        product4.setSales(20);
+
+        Product product5 = new Product();
+        product5.setSales(80);
+
+        List<Product> products = Arrays.asList(product1, product2, product3, product4, product5);
+        when(productRepository.findAll()).thenReturn(products);
+
+        List<Product> result = service.getProductsBySales(3, false);
+
+        assertNotNull(result);
+        assertEquals(3, result.size());
+        assertEquals(100, result.getFirst().getSales());
+        assertEquals(50, result.getLast().getSales());
+    }
+
+    @Test
+    void testFilterByLowestSalesIfAmountSmaller(){
+        product1.setSales(30);
+
+        Product product2 = new Product();
+        product2.setSales(100);
+
+        Product product3 = new Product();
+        product3.setSales(50);
+
+        Product product4 = new Product();
+        product4.setSales(20);
+
+        Product product5 = new Product();
+        product5.setSales(80);
+
+        List<Product> products = Arrays.asList(product1, product2, product3, product4, product5);
+        when(productRepository.findAll()).thenReturn(products);
+
+        List<Product> result = service.getProductsBySales(3, true);
+
+        assertNotNull(result);
+        assertEquals(3, result.size());
+        assertEquals(20, result.getFirst().getSales());
+        assertEquals(50, result.getLast().getSales());
+    }
+
 //    @Test
 //    void testFilterIfEmpty(){
 //        when(productRepository.findAll()).thenReturn(new ArrayList<Product>());
