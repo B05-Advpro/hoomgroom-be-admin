@@ -36,6 +36,7 @@ public class PromoCodeServiceImplTest {
     @Test
     void testCreateAndFindAll(){
         promoCode1.setCodeName("BELANJAHEMAT75");
+        promoCode1.setCodeId("6f42392e-40a2-475a-9c00-c667307c20d8");
         when(promoCodeRepository.save(any(PromoCode.class))).thenReturn(promoCode1);
         service.create(promoCode1);
 

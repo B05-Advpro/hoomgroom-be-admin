@@ -1,6 +1,8 @@
 package id.ac.ui.cs.advprog.hoomgroombeadmin.model;
 
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
@@ -9,7 +11,12 @@ import java.util.Set;
 import java.util.UUID;
 
 @Getter
+@Entity
+@NoArgsConstructor
+@Table(name = "promoCode")
 public class PromoCode {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     String codeId;
     String codeName;
     LocalDate endDate;
@@ -19,8 +26,6 @@ public class PromoCode {
     int discPercentage = 0;
 
     private static Set<String> allNames = new HashSet<>();
-
-    public PromoCode(){};
 
     public PromoCode(String codeName, LocalDate endDate, String description, Double minimumPayment){
         if (!isAlphaNumeric(codeName) || !isNameUnique(codeName)){
