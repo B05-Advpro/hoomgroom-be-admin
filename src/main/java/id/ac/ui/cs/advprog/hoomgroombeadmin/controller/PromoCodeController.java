@@ -34,7 +34,7 @@ public class PromoCodeController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PostMapping("/delete/{promoCodeId}")
+    @DeleteMapping("/delete/{promoCodeId}")
     public ResponseEntity<String> deletePromoCode(@PathVariable String promoCodeId){
         String result = "Deleted promo code with ID " + service.delete(promoCodeId);
         return new ResponseEntity<>(result, HttpStatus.OK);

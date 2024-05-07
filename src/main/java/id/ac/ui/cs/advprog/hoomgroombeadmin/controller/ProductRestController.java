@@ -38,7 +38,7 @@ public class ProductRestController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PostMapping("/delete/{productId}")
+    @DeleteMapping("/delete/{productId}")
     public ResponseEntity<String> deleteProduct(@PathVariable String productId){
         String result = "Deleted product with ID " + service.delete(productId);
         return new ResponseEntity<>(result, HttpStatus.OK);
