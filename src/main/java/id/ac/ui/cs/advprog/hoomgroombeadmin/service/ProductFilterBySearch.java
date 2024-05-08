@@ -7,11 +7,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ProductFilterBySearch implements ProductFilterStrategy{
-
     @Override
-    List<Product> sort(List<Product> products, String keyword) {
+    public List<Product> sort(List<Product> products) {
         return products.stream()
-                .filter(product -> product.getProductName().toLowerCase().contains(keyword.toLowerCase()))
+                .sorted(Comparator.comparing(Product::getProductName))
                 .collect(Collectors.toList());
     }
 }

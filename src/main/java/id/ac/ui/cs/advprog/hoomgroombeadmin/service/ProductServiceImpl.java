@@ -71,9 +71,9 @@ public class ProductServiceImpl implements ProductService{
         }
     }
 
-    public List<Product> getProductsBySearched(int amount, boolean fromLowest ){
-        filterContext.setStrategy(new ProductFilterByPrice());
-        List<Product> sortedByPrice = filterContext.executeStrategy(productRepository.findAll());
+    public List<Product> getProductsBySearched(int amount, boolean fromLowest, String keyword ){
+        filterContext.setStrategy(new ProductFilterBySearch());
+        List<Product> sortedByPrice = filterContext.executeStrategy(productRepository.findByNameContainingIgnoreCase(keyword));
 
         if (amount > sortedByPrice.size()){
             if (fromLowest) return sortedByPrice;
