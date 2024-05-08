@@ -18,9 +18,6 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public Product create(Product product) {
-        UUID productId = new UUID(32, 10);
-        product.setId(productId.toString());
-        product.setSales(0);
         return productRepository.save(product);
     }
 
@@ -76,16 +73,35 @@ public class ProductServiceImpl implements ProductService{
 
     public List<Product> getProductsBySearched(int amount, boolean fromLowest ){
         filterContext.setStrategy(new ProductFilterByPrice());
-        List<Product> sortedbyPrice = filterContext.executeStrategy(productRepository.findAll());
+        List<Product> sortedByPrice = filterContext.executeStrategy(productRepository.findAll());
 
-        if (amount > sortedbyPrice.size()){
-            if (fromLowest) return sortedbyPrice;
-            else return sortedbyPrice.reversed();
+        if (amount > sortedByPrice.size()){
+            if (fromLowest) return sortedByPrice;
+            else return sortedByPrice.reversed();
         }
         if (fromLowest) {
-            return sortedbyPrice.subList(0, amount);
+            return sortedByPrice.subList(0, amount);
         } else {
-            return sortedbyPrice.reversed().subList(0, amount);
+            return sortedByPrice.reversed().subList(0, amount);
+        }
+    }
+
+    /* Will return empty list if there are no products found
+    amount: the number of products that will be returned in the list
+    fromLowest: true when you want to sort price from lowest
+    */
+    public List<Product> getProductsBySales(int amount, boolean fromLowest){
+        filterContext.setStrategy(new ProductFilterBySales());
+        List<Product> sortedBySales = filterContext.executeStrategy(productRepository.findAll());
+
+        if (amount > sortedBySales.size()){
+            if (fromLowest) return sortedBySales;
+            else return sortedBySales.reversed();
+        }
+        if (fromLowest) {
+            return sortedBySales.subList(0, amount);
+        } else {
+            return sortedBySales.reversed().subList(0, amount);
         }
     }
 
