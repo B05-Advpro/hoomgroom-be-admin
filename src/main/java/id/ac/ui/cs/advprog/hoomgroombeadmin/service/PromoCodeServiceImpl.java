@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class PromoCodeServiceImpl implements PromoCodeService{
+public class
+PromoCodeServiceImpl implements PromoCodeService{
 
     @Autowired
     PromoCodeRepository promoCodeRepository;

@@ -71,18 +71,18 @@ public class ProductServiceImpl implements ProductService{
         }
     }
 
-    public List<Product> getProductsBySearched(int amount, boolean fromLowest ){
-        filterContext.setStrategy(new ProductFilterByPrice());
-        List<Product> sortedByPrice = filterContext.executeStrategy(productRepository.findAll());
+    public List<Product> getProductsBySearched(int amount, boolean fromLowest, String keyword){
+        filterContext.setStrategy(new ProductFilterBySearch());
+        List<Product> searchedProducts = filterContext.executeStrategy(productRepository.findByNameContainingIgnoreCase(keyword));
 
-        if (amount > sortedByPrice.size()){
-            if (fromLowest) return sortedByPrice;
-            else return sortedByPrice.reversed();
+        if (amount > searchedProducts.size()){
+            if (fromLowest) return searchedProducts;
+            else return searchedProducts.reversed();
         }
         if (fromLowest) {
-            return sortedByPrice.subList(0, amount);
+            return searchedProducts.subList(0, amount);
         } else {
-            return sortedByPrice.reversed().subList(0, amount);
+            return searchedProducts.reversed().subList(0, amount);
         }
     }
 
@@ -102,6 +102,21 @@ public class ProductServiceImpl implements ProductService{
             return sortedBySales.subList(0, amount);
         } else {
             return sortedBySales.reversed().subList(0, amount);
+        }
+    }
+
+    public List<Product> getProductsByTag(int amount, boolean fromLowest){
+        filterContext.setStrategy(new ProductFilterByTag());
+        List<Product> taggedProducts = filterContext.executeStrategy(productRepository.findAll());
+
+        if (amount > taggedProducts.size()){
+            if (fromLowest) return taggedProducts;
+            else return taggedProducts.reversed();
+        }
+        if (fromLowest) {
+            return taggedProducts.subList(0, amount);
+        } else {
+            return taggedProducts.reversed().subList(0, amount);
         }
     }
 
