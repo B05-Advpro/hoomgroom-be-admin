@@ -371,42 +371,108 @@ public class ProductServiceTest {
         assertEquals(50, result.getLast().getSales());
     }
 
-//    @Test
-//    void testFilterIfEmpty(){
-//        when(productRepository.findAll()).thenReturn(new ArrayList<Product>());
-//        List<Product> result = service.getProductsByPrice(10, false);
-//
-//        assertNotNull(result);
-//        assertEquals(0, result.size());
-//    }
-//
-//    @Test
-//    void testSearchedKeywordEmpty() {
-//        when(productRepository.findAll()).thenReturn(new ArrayList<Product>());
-//        List<Product> result = service.getProductsBySearch(5, false, "Furry");
-//
-//        assertNotNull(result);
-//        assertEquals(0, result.size());
-//    }
-//
-//    @Test
-//    void testSearchedKeywordNotEmpty() {
-//        Product searchedProduct1 = new Product();
-//        searchedProduct1.setProductName("Furry 1");
-//
-//        Product searchedProduct2 = new Product();
-//        searchedProduct2.setProductName("Furry 2");
-//
-//        Product searchedProduct3 = new Product();
-//        searchedProduct3.setProductName("Furry 3");
-//
-//        List<Product> products = Arrays.asList(searchedProduct2, searchedProduct1, searchedProduct3);
-//        when(productRepository.findAll()).thenReturn(products);
-//
-//        List<Product> result = service.getProductsBySearch(3, false);
-//        assertEquals(8, result.size());
-//        assertEquals("Furry 1", result.getFirst().getProductName());
-//        assertEquals("Furry 2", result.get(1).getProductName());
-//        assertEquals("Furry 3", result.getLast().getProductName());
-//    }
+   @Test
+   void testFilterIfEmpty(){
+       when(productRepository.findAll()).thenReturn(new ArrayList<Product>());
+       List<Product> result = service.getProductsByPrice(10, false);
+
+       assertNotNull(result);
+       assertEquals(0, result.size());
+   }
+
+   @Test
+   void testSearchIfEmpty(){
+       when(productRepository.findByNameContainingIgnoreCase("Test")).thenReturn(new ArrayList<Product>());
+       List<Product> result = service.getProductsBySearched(10, false, "Test");
+
+       assertNotNull(result);
+       assertEquals(0, result.size());
+   }
+
+   @Test
+   void testSearchedKeywordNotEmptyAscending() {
+       Product searchedProduct1 = new Product();
+       searchedProduct1.setProductName("Furry 1");
+
+       Product searchedProduct2 = new Product();
+       searchedProduct2.setProductName("Furry 2");
+
+       Product searchedProduct3 = new Product();
+       searchedProduct3.setProductName("Furry 3");
+
+       List<Product> products = Arrays.asList(searchedProduct2, searchedProduct1, searchedProduct3);
+       when(productRepository.findByNameContainingIgnoreCase("Furry")).thenReturn(products);
+
+       List<Product> result = service.getProductsBySearched(3, true, "Furry");
+
+       assertEquals(3, result.size());
+       assertEquals("Furry 1", result.getFirst().getProductName());
+       assertEquals("Furry 2", result.get(1).getProductName());
+       assertEquals("Furry 3", result.getLast().getProductName());
+   }
+
+    void testSearchedKeywordNotEmptyDescending() {
+        Product searchedProduct1 = new Product();
+        searchedProduct1.setProductName("Furry 1");
+
+        Product searchedProduct2 = new Product();
+        searchedProduct2.setProductName("Furry 2");
+
+        Product searchedProduct3 = new Product();
+        searchedProduct3.setProductName("Furry 3");
+
+        List<Product> products = Arrays.asList(searchedProduct2, searchedProduct1, searchedProduct3);
+        when(productRepository.findByNameContainingIgnoreCase("Furry")).thenReturn(products);
+
+        List<Product> result = service.getProductsBySearched(3, false, "Furry");
+
+        assertEquals(3, result.size());
+        assertEquals("Furry 3", result.getFirst().getProductName());
+        assertEquals("Furry 2", result.get(1).getProductName());
+        assertEquals("Furry 1", result.getLast().getProductName());
+    }
+
+    @Test
+    void testFilterByTagAscending() {
+        Product taggedProduct1 = new Product();
+        List<String> tag1 = Arrays.asList("vintage", "white", "indoor");
+        taggedProduct1.setProductName("Product1");
+        taggedProduct1.setTag(tag1);
+
+        Product taggedProduct2 = new Product();
+        List<String> tag2 = Arrays.asList("white", "vintage", "indoor");
+        taggedProduct2.setProductName("Product2");
+        taggedProduct2.setTag(tag2);
+
+        List<Product> products = Arrays.asList(taggedProduct1, taggedProduct2);
+        when(productRepository.findAll()).thenReturn(products);
+
+        List<Product> result = service.getProductsByTag(2, true);
+        assertEquals(2, result.size());
+        assertEquals("Product1", result.getFirst().getProductName());
+        assertEquals("Product2", result.get(1).getProductName());
+
+    }
+
+    @Test
+    void testFilterByTagDescending() {
+        Product taggedProduct1 = new Product();
+        List<String> tag1 = Arrays.asList("vintage", "white", "indoor");
+        taggedProduct1.setProductName("Product1");
+        taggedProduct1.setTag(tag1);
+
+        Product taggedProduct2 = new Product();
+        List<String> tag2 = Arrays.asList("white", "vintage", "indoor");
+        taggedProduct2.setProductName("Product2");
+        taggedProduct2.setTag(tag2);
+
+        List<Product> products = Arrays.asList(taggedProduct1, taggedProduct2);
+        when(productRepository.findAll()).thenReturn(products);
+
+        List<Product> result = service.getProductsByTag(2, false);
+        assertEquals(2, result.size());
+        assertEquals("Product2", result.getFirst().getProductName());
+        assertEquals("Product1", result.get(1).getProductName());
+
+    }
 }
