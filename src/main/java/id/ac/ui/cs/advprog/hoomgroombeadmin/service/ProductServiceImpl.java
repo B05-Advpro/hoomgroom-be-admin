@@ -56,6 +56,7 @@ public class ProductServiceImpl implements ProductService{
     amount: the number of products that will be returned in the list
     fromLowest: true when you want to sort price from lowest
     */
+    @Override
     public List<Product> getProductsByPrice(int amount, boolean fromLowest){
         filterContext.setStrategy(new ProductFilterByPrice());
         List<Product> sortedbyPrice = filterContext.executeStrategy(productRepository.findAll());
@@ -71,9 +72,10 @@ public class ProductServiceImpl implements ProductService{
         }
     }
 
+    @Override
     public List<Product> getProductsBySearched(int amount, boolean fromLowest, String keyword){
         filterContext.setStrategy(new ProductFilterBySearch());
-        List<Product> searchedProducts = filterContext.executeStrategy(productRepository.findByNameContainingIgnoreCase(keyword));
+        List<Product> searchedProducts = filterContext.executeStrategy(productRepository.findByProductNameContainingIgnoreCase(keyword));
 
         if (amount > searchedProducts.size()){
             if (fromLowest) return searchedProducts;
@@ -90,6 +92,7 @@ public class ProductServiceImpl implements ProductService{
     amount: the number of products that will be returned in the list
     fromLowest: true when you want to sort price from lowest
     */
+    @Override
     public List<Product> getProductsBySales(int amount, boolean fromLowest){
         filterContext.setStrategy(new ProductFilterBySales());
         List<Product> sortedBySales = filterContext.executeStrategy(productRepository.findAll());
@@ -105,6 +108,7 @@ public class ProductServiceImpl implements ProductService{
         }
     }
 
+    @Override
     public List<Product> getProductsByTag(int amount, boolean fromLowest){
         filterContext.setStrategy(new ProductFilterByTag());
         List<Product> taggedProducts = filterContext.executeStrategy(productRepository.findAll());
