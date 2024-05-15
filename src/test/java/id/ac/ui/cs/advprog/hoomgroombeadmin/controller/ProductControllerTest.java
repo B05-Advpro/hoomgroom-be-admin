@@ -40,6 +40,7 @@ public class ProductControllerTest {
     ObjectMapper objectMapper = new ObjectMapper();
     Product product1;
 
+
     @BeforeEach
     void setUp(){
         mvc = MockMvcBuilders.standaloneSetup(controller).build();
@@ -51,6 +52,7 @@ public class ProductControllerTest {
         product1.setPicture("https://th.bing.com/th/id/R.9d24e1528d7ee3c412d6711744221414?rik=5X%2fhugoJOfiwDA&pid=ImgRaw&r=0");
         product1.setRealPrice(1500000);
         product1.setDiscPrice(1000000);
+
     }
 
     @Test
