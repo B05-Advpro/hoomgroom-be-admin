@@ -9,8 +9,6 @@ import java.util.stream.Collectors;
 public class ProductFilterByTag implements ProductFilterStrategy{
     @Override
     public List<Product> sort(List<Product> products) {
-        return products.stream()
-                .sorted(Comparator.comparing(p -> p.getTag().stream().findFirst().orElse("")))
-                .collect(Collectors.toList());
+
     }
 }

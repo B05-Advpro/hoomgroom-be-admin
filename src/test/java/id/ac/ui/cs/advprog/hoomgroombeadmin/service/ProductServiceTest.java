@@ -436,15 +436,43 @@ public class ProductServiceTest {
     void testFilterByTagAscending() {
         Product taggedProduct1 = new Product();
         List<String> tag1 = Arrays.asList("vintage", "white", "indoor");
+        taggedProduct1.setProductName("Product1");
         taggedProduct1.setTag(tag1);
 
         Product taggedProduct2 = new Product();
         List<String> tag2 = Arrays.asList("white", "vintage", "indoor");
+        taggedProduct2.setProductName("Product2");
         taggedProduct2.setTag(tag2);
 
         List<Product> products = Arrays.asList(taggedProduct1, taggedProduct2);
-        when(productRepository..thenReturn(products);
+        when(productRepository.findAll()).thenReturn(products);
 
+        List<Product> result = service.getProductsByTag(2, true);
+        assertEquals(2, result.size());
+        assertEquals("Product1", result.getFirst().getProductName());
+        assertEquals("Product2", result.get(1).getProductName());
+
+    }
+
+    @Test
+    void testFilterByTagDescending() {
+        Product taggedProduct1 = new Product();
+        List<String> tag1 = Arrays.asList("vintage", "white", "indoor");
+        taggedProduct1.setProductName("Product1");
+        taggedProduct1.setTag(tag1);
+
+        Product taggedProduct2 = new Product();
+        List<String> tag2 = Arrays.asList("white", "vintage", "indoor");
+        taggedProduct2.setProductName("Product2");
+        taggedProduct2.setTag(tag2);
+
+        List<Product> products = Arrays.asList(taggedProduct2, taggedProduct1);
+        when(productRepository.findAll()).thenReturn(products);
+
+        List<Product> result = service.getProductsByTag(2, true);
+        assertEquals(2, result.size());
+        assertEquals("Product2", result.getFirst().getProductName());
+        assertEquals("Product1", result.get(1).getProductName());
 
     }
 }
