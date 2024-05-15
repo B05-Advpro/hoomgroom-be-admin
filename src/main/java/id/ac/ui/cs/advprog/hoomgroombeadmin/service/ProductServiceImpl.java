@@ -105,6 +105,19 @@ public class ProductServiceImpl implements ProductService{
         }
     }
 
+    public List<Product> getProductsByTag(int amount, boolean fromLowest){
+        filterContext.setStrategy(new ProductFilterByTag());
+        List<Product> taggedProducts = filterContext.executeStrategy(productRepository.findAll());
 
+        if (amount > taggedProducts.size()){
+            if (fromLowest) return taggedProducts;
+            else return taggedProducts.reversed();
+        }
+        if (fromLowest) {
+            return taggedProducts.subList(0, amount);
+        } else {
+            return taggedProducts.reversed().subList(0, amount);
+        }
+    }
 
 }
