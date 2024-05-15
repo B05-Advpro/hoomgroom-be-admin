@@ -466,10 +466,10 @@ public class ProductServiceTest {
         taggedProduct2.setProductName("Product2");
         taggedProduct2.setTag(tag2);
 
-        List<Product> products = Arrays.asList(taggedProduct2, taggedProduct1);
+        List<Product> products = Arrays.asList(taggedProduct1, taggedProduct2);
         when(productRepository.findAll()).thenReturn(products);
 
-        List<Product> result = service.getProductsByTag(2, true);
+        List<Product> result = service.getProductsByTag(2, false);
         assertEquals(2, result.size());
         assertEquals("Product2", result.getFirst().getProductName());
         assertEquals("Product1", result.get(1).getProductName());
