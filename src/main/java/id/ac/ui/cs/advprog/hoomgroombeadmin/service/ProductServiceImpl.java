@@ -18,8 +18,6 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public Product create(Product product) {
-        UUID productId = new UUID(32, 10);
-        product.setId(productId.toString());
         return productRepository.save(product);
     }
 
@@ -58,6 +56,7 @@ public class ProductServiceImpl implements ProductService{
     amount: the number of products that will be returned in the list
     fromLowest: true when you want to sort price from lowest
     */
+    @Override
     public List<Product> getProductsByPrice(int amount, boolean fromLowest){
         filterContext.setStrategy(new ProductFilterByPrice());
         List<Product> sortedbyPrice = filterContext.executeStrategy(productRepository.findAll());
@@ -72,4 +71,57 @@ public class ProductServiceImpl implements ProductService{
             return sortedbyPrice.reversed().subList(0, amount);
         }
     }
+
+    @Override
+    public List<Product> getProductsBySearched(int amount, boolean fromLowest, String keyword){
+        filterContext.setStrategy(new ProductFilterBySearch());
+        List<Product> searchedProducts = filterContext.executeStrategy(productRepository.findByProductNameContainingIgnoreCase(keyword));
+
+        if (amount > searchedProducts.size()){
+            if (fromLowest) return searchedProducts;
+            else return searchedProducts.reversed();
+        }
+        if (fromLowest) {
+            return searchedProducts.subList(0, amount);
+        } else {
+            return searchedProducts.reversed().subList(0, amount);
+        }
+    }
+
+    /* Will return empty list if there are no products found
+    amount: the number of products that will be returned in the list
+    fromLowest: true when you want to sort price from lowest
+    */
+    @Override
+    public List<Product> getProductsBySales(int amount, boolean fromLowest){
+        filterContext.setStrategy(new ProductFilterBySales());
+        List<Product> sortedBySales = filterContext.executeStrategy(productRepository.findAll());
+
+        if (amount > sortedBySales.size()){
+            if (fromLowest) return sortedBySales;
+            else return sortedBySales.reversed();
+        }
+        if (fromLowest) {
+            return sortedBySales.subList(0, amount);
+        } else {
+            return sortedBySales.reversed().subList(0, amount);
+        }
+    }
+
+    @Override
+    public List<Product> getProductsByTag(int amount, boolean fromLowest){
+        filterContext.setStrategy(new ProductFilterByTag());
+        List<Product> taggedProducts = filterContext.executeStrategy(productRepository.findAll());
+
+        if (amount > taggedProducts.size()){
+            if (fromLowest) return taggedProducts;
+            else return taggedProducts.reversed();
+        }
+        if (fromLowest) {
+            return taggedProducts.subList(0, amount);
+        } else {
+            return taggedProducts.reversed().subList(0, amount);
+        }
+    }
+
 }

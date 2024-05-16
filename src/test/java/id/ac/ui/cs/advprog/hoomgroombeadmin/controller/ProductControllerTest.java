@@ -2,7 +2,7 @@ package id.ac.ui.cs.advprog.hoomgroombeadmin.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import id.ac.ui.cs.advprog.hoomgroombeadmin.controller.ProductController;
+import id.ac.ui.cs.advprog.hoomgroombeadmin.controller.ProductRestController;
 
 import id.ac.ui.cs.advprog.hoomgroombeadmin.model.Product;
 import id.ac.ui.cs.advprog.hoomgroombeadmin.service.ProductService;
@@ -35,10 +35,11 @@ public class ProductControllerTest {
     private ProductService productService;
 
     @InjectMocks
-    private ProductController controller;
+    private ProductRestController controller;
 
     ObjectMapper objectMapper = new ObjectMapper();
     Product product1;
+
 
     @BeforeEach
     void setUp(){
@@ -51,6 +52,7 @@ public class ProductControllerTest {
         product1.setPicture("https://th.bing.com/th/id/R.9d24e1528d7ee3c412d6711744221414?rik=5X%2fhugoJOfiwDA&pid=ImgRaw&r=0");
         product1.setRealPrice(1500000);
         product1.setDiscPrice(1000000);
+
     }
 
     @Test
@@ -123,7 +125,7 @@ public class ProductControllerTest {
         UUID productId = new UUID(32, 10);
         String expectedResult = "Deleted product with ID " + productId;
         when(productService.delete(productId.toString())).thenReturn(productId.toString());
-        mvc.perform(post("/admin/product/delete/" + productId.toString()))
+        mvc.perform(delete("/admin/product/delete/" + productId.toString()))
                 .andExpect(status().isOk())
                 .andDo(result -> {String responseBody = result.getResponse().getContentAsString();
                 assertEquals(expectedResult, responseBody);});
@@ -132,7 +134,7 @@ public class ProductControllerTest {
     @Test
     public void listProductTest() throws Exception {
         when(productService.getAll()).thenReturn(Arrays.asList(product1));
-        mvc.perform(get("/product/list"))
+        mvc.perform(get("/admin/product/list"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andDo(result -> {List<Product> products = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<List<Product>>() {});

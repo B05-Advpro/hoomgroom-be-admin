@@ -9,4 +9,8 @@ public interface ProductService {
     public Product edit(Product editedProduct);
     public List<Product> getAll();
     public Product getProductById(String productId);
+    public List<Product> getProductsByPrice(int amount, boolean fromLowest);
+    public List<Product> getProductsBySales(int amount, boolean fromLowest);
+    public List<Product> getProductsBySearched(int amount, boolean fromLowest, String keyword);
+    public List<Product> getProductsByTag(int amount, boolean fromLowest);
 }

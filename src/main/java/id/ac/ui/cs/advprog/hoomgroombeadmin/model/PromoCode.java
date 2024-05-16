@@ -1,6 +1,8 @@
 package id.ac.ui.cs.advprog.hoomgroombeadmin.model;
 
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
@@ -9,21 +11,26 @@ import java.util.Set;
 import java.util.UUID;
 
 @Getter
+@Entity
+@NoArgsConstructor
+@Table(name = "promoCode")
 public class PromoCode {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     String codeId;
+
+    @Column(unique=true)
     String codeName;
-    LocalDate endDate;
+
     @Setter
     String description;
+
+    LocalDate endDate;
     Double minimumPayment;
     int discPercentage = 0;
 
-    private static Set<String> allNames = new HashSet<>();
-
-    public PromoCode(){};
-
     public PromoCode(String codeName, LocalDate endDate, String description, Double minimumPayment){
-        if (!isAlphaNumeric(codeName) || !isNameUnique(codeName)){
+        if (!isAlphaNumeric(codeName)){
             throw new IllegalArgumentException("Nama kode promo tidak valid.");
         }
         if (!isValidEndDate(endDate)){
@@ -38,8 +45,6 @@ public class PromoCode {
         this.endDate = endDate;
         this.description = description;
         this.minimumPayment = minimumPayment;
-
-        allNames.add(this.codeName);
     }
 
     public boolean isValidEndDate(LocalDate endDate){
@@ -64,10 +69,6 @@ public class PromoCode {
         return this.discPercentage <= 100 && this.discPercentage >= 1;
     }
 
-    public boolean isNameUnique(String codeName){
-        return !allNames.contains(codeName);
-    }
-
     public void setEndDate(LocalDate endDate) {
         if (endDate.isBefore(LocalDate.now())){
             throw new IllegalArgumentException("Tanggal kode promo berakhir tidak bisa sebelum tanggal saat ini.");
@@ -83,12 +84,10 @@ public class PromoCode {
     }
 
     public void setCodeName(String name){
-        if (!isAlphaNumeric(name) || !isNameUnique(name)){
+        if (!isAlphaNumeric(name)){
             throw new IllegalArgumentException("Nama kode promo tidak valid.");
         }
-        allNames.remove(this.codeName);
         this.codeName = name.toUpperCase();
-        allNames.add(this.codeName);
     }
 
     public void setCodeId(String id) throws IllegalArgumentException{
