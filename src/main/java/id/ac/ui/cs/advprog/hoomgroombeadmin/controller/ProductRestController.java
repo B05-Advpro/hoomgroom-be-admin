@@ -83,6 +83,7 @@ public class ProductRestController {
             case "sales": result = service.getProductsBySales(amount, fromLowest); break;
             case "search": result = service.getProductsBySearched(amount, fromLowest, keyword); break;
             case "tag": result = service.getProductsByTag(amount, fromLowest); break;
+            default: return new ResponseEntity<>(result, HttpStatus.OK);
         }
 
         return new ResponseEntity<>(result, HttpStatus.OK);
