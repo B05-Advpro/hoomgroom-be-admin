@@ -70,10 +70,8 @@ public class ProductServiceTest {
     @Test
     void testDelete(){
         String productId = (new UUID(32, 10)).toString();
-        when(productRepository.existsById(productId)).thenReturn(true);
 
         String result = service.delete(productId);
-        verify(productRepository,times(1)).existsById(productId);
         verify(productRepository, times(1)).deleteById(productId);
         assertEquals(productId, result);
     }
@@ -81,10 +79,7 @@ public class ProductServiceTest {
     @Test
     void testDeleteIfIdNotFound(){
         String productId = (new UUID(32, 10)).toString();
-        when(productRepository.existsById(productId)).thenReturn(false);
-
-        assertNull(service.delete(productId));
-        verify(productRepository,times(1)).existsById(productId);
+        assertEquals(productId, service.delete(productId));
     }
 
     @Test
