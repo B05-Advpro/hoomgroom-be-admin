@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class ProductServiceImpl implements ProductService{
@@ -127,7 +128,7 @@ public class ProductServiceImpl implements ProductService{
 
     @Transactional
     @Override
-    public int incrementSales(String productId, int quantity) {
-        return 0;
+    public CompletableFuture<Integer> incrementSales(String productId, int quantity) {
+        return null;
     }
 }

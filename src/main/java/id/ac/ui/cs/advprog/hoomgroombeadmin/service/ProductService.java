@@ -2,6 +2,7 @@ package id.ac.ui.cs.advprog.hoomgroombeadmin.service;
 
 import id.ac.ui.cs.advprog.hoomgroombeadmin.model.Product;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public interface ProductService {
     public Product create(Product product);
@@ -13,5 +14,5 @@ public interface ProductService {
     public List<Product> getProductsBySales(int amount, boolean fromLowest);
     public List<Product> getProductsBySearched(int amount, boolean fromLowest, String keyword);
     public List<Product> getProductsByTag(int amount, boolean fromLowest);
-    public int incrementSales(String productId, int quantity);
+    public CompletableFuture<Integer> incrementSales(String productId, int quantity);
 }
