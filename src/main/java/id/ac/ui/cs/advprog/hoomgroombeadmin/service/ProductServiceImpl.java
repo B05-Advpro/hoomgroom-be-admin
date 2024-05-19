@@ -4,6 +4,7 @@ import id.ac.ui.cs.advprog.hoomgroombeadmin.model.Product;
 import id.ac.ui.cs.advprog.hoomgroombeadmin.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -126,9 +127,11 @@ public class ProductServiceImpl implements ProductService{
         }
     }
 
+    @Async
     @Transactional
     @Override
     public CompletableFuture<Integer> incrementSales(String productId, int quantity) {
-        return null;
+        Integer result = productRepository.incrementSales(productId, quantity);
+        return CompletableFuture.completedFuture(result);
     }
 }
