@@ -382,7 +382,7 @@ public class ProductServiceTest {
 
    @Test
    void testSearchIfEmpty(){
-       when(productRepository.findByNameContainingIgnoreCase("Test")).thenReturn(new ArrayList<Product>());
+       when(productRepository.findByProductNameContainingIgnoreCase("Test")).thenReturn(new ArrayList<Product>());
        List<Product> result = service.getProductsBySearched(10, false, "Test");
 
        assertNotNull(result);
@@ -401,7 +401,7 @@ public class ProductServiceTest {
        searchedProduct3.setProductName("Furry 3");
 
        List<Product> products = Arrays.asList(searchedProduct2, searchedProduct1, searchedProduct3);
-       when(productRepository.findByNameContainingIgnoreCase("Furry")).thenReturn(products);
+       when(productRepository.findByProductNameContainingIgnoreCase("Furry")).thenReturn(products);
 
        List<Product> result = service.getProductsBySearched(3, true, "Furry");
 
@@ -422,7 +422,7 @@ public class ProductServiceTest {
         searchedProduct3.setProductName("Furry 3");
 
         List<Product> products = Arrays.asList(searchedProduct2, searchedProduct1, searchedProduct3);
-        when(productRepository.findByNameContainingIgnoreCase("Furry")).thenReturn(products);
+        when(productRepository.findByProductNameContainingIgnoreCase("Furry")).thenReturn(products);
 
         List<Product> result = service.getProductsBySearched(3, false, "Furry");
 
