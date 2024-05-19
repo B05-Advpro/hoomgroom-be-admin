@@ -5,9 +5,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface ProductService {
-    public Product create(Product product);
+    public Product save(Product product);
     public String delete(String productId);
-    public Product edit(Product editedProduct);
     public List<Product> getAll();
     public Product getProductById(String productId);
     public List<Product> getProductsByPrice(int amount, boolean fromLowest);

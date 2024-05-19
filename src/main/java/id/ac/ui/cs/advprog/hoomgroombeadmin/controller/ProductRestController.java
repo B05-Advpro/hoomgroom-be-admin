@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 
 @RestController
@@ -24,13 +26,13 @@ public class ProductRestController {
 
     @PostMapping("/create")
     public ResponseEntity<Product> createProductPost(@RequestBody Product product) throws JsonProcessingException {
-        Product result = service.create(product);
+        Product result = service.save(product);
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
     @PostMapping("/update/save")
     public ResponseEntity<Product> updateProductPost(@RequestBody Product product) {
-        Product result = service.edit(product);
+        Product result = service.save(product);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
