@@ -91,7 +91,6 @@ public class PromoCode {
     }
 
     public void setCodeId(String id) throws IllegalArgumentException{
-        UUID uuid = UUID.fromString(id);
         this.codeId = id;
     }
 }

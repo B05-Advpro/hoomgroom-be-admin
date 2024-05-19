@@ -58,18 +58,6 @@ public class ProductRestController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-//    @GetMapping("/filter?sortby=")
-//    public ResponseEntity<List<Product>> listProductByPrice(){
-//        List<Product> result = service.getAll();
-//        return new ResponseEntity<>(result, HttpStatus.OK);
-//    }
-
-//    @GetMapping("/filter?sortby=")
-//    public ResponseEntity<List<Product>> searchProduct(){
-//        List<Product> result = service.getAll();
-//        return new ResponseEntity<>(result, HttpStatus.OK);
-//    }
-
     @GetMapping("/filter")
     public ResponseEntity<List<Product>> filterProducts(
             @RequestParam String filterType,
