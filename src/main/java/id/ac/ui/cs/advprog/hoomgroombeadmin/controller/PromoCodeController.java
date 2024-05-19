@@ -14,6 +14,7 @@ import java.util.List;
 @RequestMapping("/admin/promo-code")
 public class PromoCodeController {
 
+    @Autowired
     private PromoCodeService service;
 
     @PostMapping("/create")
