@@ -57,7 +57,7 @@ public class ProductControllerTest {
 
     @Test
     public void createProductTest() throws Exception {
-        when(productService.create(any(Product.class))).thenReturn(product1);
+        when(productService.save(any(Product.class))).thenReturn(product1);
         mvc.perform(post("/admin/product/create").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(product1)))
                 .andExpect(status().isCreated())
@@ -73,12 +73,12 @@ public class ProductControllerTest {
                     assertTrue(product.getTag().contains("indoor"));
                 });
 
-        verify(productService,times(1)).create(any(Product.class));
+        verify(productService,times(1)).save(any(Product.class));
     }
 
     @Test
     public void updateProductPostTest() throws Exception {
-        when(productService.edit(any(Product.class))).thenReturn(product1);
+        when(productService.save(any(Product.class))).thenReturn(product1);
         mvc.perform(post("/admin/product/update/save")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(product1)))
@@ -94,7 +94,7 @@ public class ProductControllerTest {
                 assertTrue(product.getTag().contains("white"));
                 assertTrue(product.getTag().contains("indoor"));
             });
-        verify(productService, times(1)).edit(any(Product.class));
+        verify(productService, times(1)).save(any(Product.class));
     }
 
     @Test

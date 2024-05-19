@@ -43,7 +43,7 @@ public class ProductServiceTest {
     void testCreateAndFindAll(){
         when(productRepository.save(any(Product.class))).thenReturn(product1);
         product1.setId("6f42392e-40a2-475a-9c00-c667307c20d8");
-        service.create(product1);
+        service.save(product1);
 
         verify(productRepository,times(1)).save(product1);
 
@@ -90,12 +90,10 @@ public class ProductServiceTest {
     @Test
     void testGetProductByIdFound(){
         product1.setId("eb558e9f-1c39-460e-8860-71af6af63bd6");
-        when(productRepository.existsById("eb558e9f-1c39-460e-8860-71af6af63bd6")).thenReturn(true);
         when(productRepository.findById("eb558e9f-1c39-460e-8860-71af6af63bd6")).thenReturn(Optional.ofNullable(product1));
 
         Product savedProduct = service.getProductById("eb558e9f-1c39-460e-8860-71af6af63bd6");
 
-        verify(productRepository,times(1)).existsById("eb558e9f-1c39-460e-8860-71af6af63bd6");
         verify(productRepository,times(1)).findById("eb558e9f-1c39-460e-8860-71af6af63bd6");
         assertEquals("eb558e9f-1c39-460e-8860-71af6af63bd6", savedProduct.getId());
         assertEquals("Furniture 1", savedProduct.getProductName());
@@ -111,10 +109,7 @@ public class ProductServiceTest {
 
     @Test
     void testGetProductByIdNotFound(){
-        when(productRepository.existsById("0000")).thenReturn(false);
-
         assertNull(service.getProductById("0000"));
-        verify(productRepository,times(1)).existsById("0000");
     }
 
     @Test
@@ -129,8 +124,7 @@ public class ProductServiceTest {
         product1.setDiscPrice(2000000);
 
         when(productRepository.save(product1)).thenReturn(product1);
-        when(productRepository.existsById("eb558e9f-1c39-460e-8860-71af6af63bd6")).thenReturn(true);
-        Product result = service.edit(product1);
+        Product result = service.save(product1);
 
         verify(productRepository,times(1)).save(product1);
         assertEquals(product1.getId(), result.getId());
@@ -141,16 +135,6 @@ public class ProductServiceTest {
         assertEquals(product1.getRealPrice(), result.getRealPrice());
         assertEquals(product1.getTag().getFirst(), product1.getTag().getFirst());
         assertEquals(product1.getTag().getLast(), product1.getTag().getLast());
-    }
-
-    @Test
-    void testEditIfIdNotFound(){
-        Product product = new Product();
-        product.setId("11111");
-        when(productRepository.existsById("11111")).thenReturn(false);
-
-        assertNull(service.edit(product));
-        verify(productRepository, times(1)).existsById("11111");
     }
 
     @Test
