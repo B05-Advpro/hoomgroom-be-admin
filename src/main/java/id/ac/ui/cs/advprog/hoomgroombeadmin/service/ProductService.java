@@ -13,5 +13,5 @@ public interface ProductService {
     public List<Product> getProductsBySales(int amount, boolean fromLowest);
     public List<Product> getProductsBySearched(int amount, boolean fromLowest, String keyword);
     public List<Product> getProductsByTag(int amount, boolean fromLowest);
-    public void incrementSales(String productId, int quantity);
+    public int incrementSales(String productId, int quantity);
 }

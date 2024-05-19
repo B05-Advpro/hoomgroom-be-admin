@@ -2,6 +2,7 @@ package id.ac.ui.cs.advprog.hoomgroombeadmin.service;
 
 import id.ac.ui.cs.advprog.hoomgroombeadmin.model.Product;
 import id.ac.ui.cs.advprog.hoomgroombeadmin.repository.ProductRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -124,8 +125,9 @@ public class ProductServiceImpl implements ProductService{
         }
     }
 
+    @Transactional
     @Override
-    public void incrementSales(String productId, int quantity) {
-        return;
+    public int incrementSales(String productId, int quantity) {
+        return 0;
     }
 }
