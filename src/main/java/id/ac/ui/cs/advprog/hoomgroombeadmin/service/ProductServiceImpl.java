@@ -125,7 +125,7 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public Product incrementSales(String productId) {
-        return null;
+    public void incrementSales(String productId, int quantity) {
+        return;
     }
 }
