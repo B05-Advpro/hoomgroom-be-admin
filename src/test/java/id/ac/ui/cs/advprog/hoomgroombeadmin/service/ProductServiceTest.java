@@ -12,6 +12,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.ArgumentMatchers.any;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -474,5 +476,29 @@ public class ProductServiceTest {
         assertEquals("Product2", result.getFirst().getProductName());
         assertEquals("Product1", result.get(1).getProductName());
 
+    }
+
+    @Test
+    void incrementSalesSuccess() throws ExecutionException, InterruptedException {
+        String productId = "ABC123";
+        int quantity = 3;
+        when(productRepository.incrementSales(anyString(), anyInt())).thenReturn(1);
+
+        CompletableFuture<Integer> future = service.incrementSales(productId, quantity);
+        int result = future.get();
+
+        assertEquals(1, result);
+    }
+
+    @Test
+    void incrementSalesFailed() throws ExecutionException, InterruptedException {
+        String productId = "ABC123";
+        int quantity = 3;
+        when(productRepository.incrementSales(anyString(), anyInt())).thenReturn(0);
+
+        CompletableFuture<Integer> future = service.incrementSales(productId, quantity);
+        int result = future.get();
+
+        assertEquals(0, result);
     }
 }
