@@ -18,64 +18,75 @@ import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/admin/product")
+@RequiredArgsConstructor
 public class ProductRestController {
 
-    @Autowired
-    private ProductService service;
-    private ProductFilterContext productFilterContext;
+    private final ProductService service;
 
     @PostMapping("/create")
-    public ResponseEntity<Product> createProductPost(@RequestBody Product product) throws JsonProcessingException {
-        Product result = service.save(product);
-        return new ResponseEntity<>(result, HttpStatus.CREATED);
+    public CompletableFuture<ResponseEntity<Product>> createProductPost(@RequestBody Product product) {
+        return CompletableFuture.supplyAsync(() -> {
+            Product result = service.save(product);
+            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+        });
     }
 
     @PostMapping("/update/save")
-    public ResponseEntity<Product> updateProductPost(@RequestBody Product product) {
-        Product result = service.save(product);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+    public CompletableFuture<ResponseEntity<Product>> updateProductPost(@RequestBody Product product) {
+        return CompletableFuture.supplyAsync(() -> {
+            Product result = service.save(product);
+            return ResponseEntity.ok(result);
+        });
     }
 
     @GetMapping("/update/{productId}")
-    public ResponseEntity<Product> updateProductPage(@PathVariable String productId){
-        Product result = service.getProductById(productId);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+    public CompletableFuture<ResponseEntity<Product>> updateProductPage(@PathVariable String productId) {
+        return CompletableFuture.supplyAsync(() -> {
+            Product result = service.getProductById(productId);
+            return ResponseEntity.ok(result);
+        });
     }
 
     @DeleteMapping("/delete/{productId}")
-    public ResponseEntity<String> deleteProduct(@PathVariable String productId){
-        String result = "Deleted product with ID " + service.delete(productId);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+    public CompletableFuture<ResponseEntity<String>> deleteProduct(@PathVariable String productId) {
+        return CompletableFuture.supplyAsync(() -> {
+            String result = "Deleted product with ID " + service.delete(productId);
+            return ResponseEntity.ok(result);
+        });
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<Product>> listProduct(){
-        List<Product> result = service.getAll();
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
-
-    @GetMapping("/filter?sortby=")
-    public ResponseEntity<List<Product>> listProductByTag(){
-        List<Product> result = service.getAll();
-        return new ResponseEntity<>(result, HttpStatus.OK);
+    public CompletableFuture<ResponseEntity<List<Product>>> listProduct() {
+        return CompletableFuture.supplyAsync(() -> {
+            List<Product> result = service.getAll();
+            return ResponseEntity.ok(result);
+        });
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<List<Product>> filterProducts(
+    public CompletableFuture<ResponseEntity<List<Product>>> filterProducts(
             @RequestParam String filterType,
             @RequestParam int amount,
             @RequestParam boolean fromLowest,
             @RequestParam(required = false) String keyword) {
 
-        List<Product> result = new ArrayList<>();
-        switch (filterType) {
-            case "price": result = service.getProductsByPrice(amount, fromLowest); break;
-            case "sales": result = service.getProductsBySales(amount, fromLowest); break;
-            case "search": result = service.getProductsBySearched(amount, fromLowest, keyword); break;
-            case "tag": result = service.getProductsByTag(amount, fromLowest); break;
-            default: return new ResponseEntity<>(result, HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return CompletableFuture.supplyAsync(() -> {
+            List<Product> result = new ArrayList<>();
+            switch (filterType) {
+                case "price":
+                    result = service.getProductsByPrice(amount, fromLowest);
+                    break;
+                case "sales":
+                    result = service.getProductsBySales(amount, fromLowest);
+                    break;
+                case "search":
+                    result = service.getProductsBySearched(amount, fromLowest, keyword);
+                    break;
+                case "tag":
+                    result = service.getProductsByTag(amount, fromLowest);
+                    break;
+            }
+            return ResponseEntity.ok(result);
+        });
     }
 }
