@@ -19,13 +19,13 @@ public class PromoCodeController {
 
     @PostMapping("/create")
     public ResponseEntity<PromoCode> createPromoCodePost(@RequestBody PromoCode promoCode) {
-        PromoCode result = service.create(promoCode);
+        PromoCode result = service.save(promoCode);
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
     @PostMapping("/update/save")
     public ResponseEntity<PromoCode> updatePromoCodePost(@RequestBody PromoCode promoCode) {
-        PromoCode result = service.edit(promoCode);
+        PromoCode result = service.save(promoCode);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
