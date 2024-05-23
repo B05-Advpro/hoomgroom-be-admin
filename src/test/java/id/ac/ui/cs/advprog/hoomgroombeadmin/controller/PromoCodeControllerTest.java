@@ -46,7 +46,7 @@ public class PromoCodeControllerTest {
 
     @Test
     public void createPromoCodeTest() throws Exception {
-        when(service.create(any(PromoCode.class))).thenReturn(promoCode1);
+        when(service.save(any(PromoCode.class))).thenReturn(promoCode1);
 
         mvc.perform(post("/admin/promo-code/create").contentType(MediaType.APPLICATION_JSON)
                         .content("{\"id\":\"6e282868-9b5b-48a2-b509-0db4aa3615e6\",\"codeName\":\"BELANJA45\",\"minimumPayment\":90000.0,\"endDate\":[2024,12,31],\"description\":\"bagus\",\"discPercentage\":45}"))
@@ -62,12 +62,12 @@ public class PromoCodeControllerTest {
                     assertTrue(jsonObject.has("codeName"));
                     assertTrue(jsonObject.has("description"));
                 });
-        verify(service, times(1)).create(any(PromoCode.class));
+        verify(service, times(1)).save(any(PromoCode.class));
     }
 
     @Test
     public void updatePromoCodePostTest() throws Exception {
-        when(service.edit(any(PromoCode.class))).thenReturn(promoCode1);
+        when(service.save(any(PromoCode.class))).thenReturn(promoCode1);
 
         mvc.perform(post("/admin/promo-code/update/save")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -84,7 +84,7 @@ public class PromoCodeControllerTest {
                     assertTrue(jsonObject.has("codeName"));
                     assertTrue(jsonObject.has("description"));
                 });
-        verify(service, times(1)).edit(any(PromoCode.class));
+        verify(service, times(1)).save(any(PromoCode.class));
     }
 
     @Test
