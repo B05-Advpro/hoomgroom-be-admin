@@ -32,6 +32,9 @@ public class PromoCodeController {
     @GetMapping("/update/{promoCodeId}")
     public ResponseEntity<PromoCode> updatePromoCodePage(@PathVariable String promoCodeId){
         PromoCode result = service.getPromoCodeById(promoCodeId);
+        if (result == null){
+            return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
