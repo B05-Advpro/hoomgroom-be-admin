@@ -39,6 +39,9 @@ public class ProductRestController {
     @GetMapping("/update/{productId}")
     public ResponseEntity<Product> updateProductPage(@PathVariable String productId){
         Product result = service.getProductById(productId);
+        if (result == null){
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
