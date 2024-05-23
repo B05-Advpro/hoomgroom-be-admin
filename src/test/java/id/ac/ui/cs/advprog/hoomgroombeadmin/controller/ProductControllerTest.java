@@ -121,6 +121,14 @@ public class ProductControllerTest {
     }
 
     @Test
+    public void updateProductPageIdNotFoundTest() throws Exception {
+        when(productService.getProductById(anyString())).thenReturn(null);
+
+        mvc.perform(get("/admin/product/update/" + "ABC123"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void deleteProductTest() throws Exception {
         UUID productId = new UUID(32, 10);
         String expectedResult = "Deleted product with ID " + productId;
