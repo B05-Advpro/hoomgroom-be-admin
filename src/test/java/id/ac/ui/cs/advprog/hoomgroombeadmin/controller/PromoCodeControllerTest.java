@@ -111,6 +111,14 @@ public class PromoCodeControllerTest {
     }
 
     @Test
+    public void updatePromoCodePageIdNotFoundTest() throws Exception {
+        when(service.getPromoCodeById(anyString())).thenReturn(null);
+
+        mvc.perform(get("/admin/promo-code/update/" + "ABC123"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void deletePromoCodeTest() throws Exception {
         UUID promoCodeId = new UUID(32, 10);
         String expectedResult = "Deleted promo code with ID " + promoCodeId;
