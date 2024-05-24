@@ -13,12 +13,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.InjectMocks;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -42,7 +46,7 @@ public class ProductControllerTest {
 
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         mvc = MockMvcBuilders.standaloneSetup(controller).build();
         product1 = new Product();
         List<String> tags1 = Arrays.asList("vintage", "white", "indoor");
@@ -59,10 +63,11 @@ public class ProductControllerTest {
     public void createProductTest() throws Exception {
         when(productService.save(any(Product.class))).thenReturn(product1);
         mvc.perform(post("/admin/product/create").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(product1)))
+                        .content(objectMapper.writeValueAsString(product1)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andDo(result -> {Product product = objectMapper.readValue(result.getResponse().getContentAsString(), Product.class);
+                .andDo(result -> {
+                    Product product = objectMapper.readValue(result.getResponse().getContentAsString(), Product.class);
                     assertEquals(product1.getProductName(), product.getProductName());
                     assertEquals(product1.getPicture(), product.getPicture());
                     assertEquals(product1.getDescription(), product.getDescription());
@@ -73,7 +78,7 @@ public class ProductControllerTest {
                     assertTrue(product.getTag().contains("indoor"));
                 });
 
-        verify(productService,times(1)).save(any(Product.class));
+        verify(productService, times(1)).save(any(Product.class));
     }
 
     @Test
@@ -82,18 +87,19 @@ public class ProductControllerTest {
         mvc.perform(post("/admin/product/update/save")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(product1)))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(result -> {Product product = objectMapper.readValue(result.getResponse().getContentAsString(), Product.class);
-                assertEquals(product1.getProductName(), product.getProductName());
-                assertEquals(product1.getPicture(), product.getPicture());
-                assertEquals(product1.getDescription(), product.getDescription());
-                assertEquals(product1.getRealPrice(), product.getRealPrice());
-                assertEquals(product1.getDiscPrice(), product.getDiscPrice());
-                assertTrue(product.getTag().contains("vintage"));
-                assertTrue(product.getTag().contains("white"));
-                assertTrue(product.getTag().contains("indoor"));
-            });
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andDo(result -> {
+                    Product product = objectMapper.readValue(result.getResponse().getContentAsString(), Product.class);
+                    assertEquals(product1.getProductName(), product.getProductName());
+                    assertEquals(product1.getPicture(), product.getPicture());
+                    assertEquals(product1.getDescription(), product.getDescription());
+                    assertEquals(product1.getRealPrice(), product.getRealPrice());
+                    assertEquals(product1.getDiscPrice(), product.getDiscPrice());
+                    assertTrue(product.getTag().contains("vintage"));
+                    assertTrue(product.getTag().contains("white"));
+                    assertTrue(product.getTag().contains("indoor"));
+                });
         verify(productService, times(1)).save(any(Product.class));
     }
 
@@ -104,19 +110,20 @@ public class ProductControllerTest {
         when(productService.getProductById(productId.toString())).thenReturn(product1);
 
         mvc.perform(get("/admin/product/update/" + productId.toString()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andDo(result -> {Product product = objectMapper.readValue(result.getResponse().getContentAsString(), Product.class);
-                assertEquals(productId.toString(), product.getId());
-                assertEquals(product1.getProductName(), product.getProductName());
-                assertEquals(product1.getPicture(), product.getPicture());
-                assertEquals(product1.getDescription(), product.getDescription());
-                assertEquals(product1.getRealPrice(), product.getRealPrice());
-                assertEquals(product1.getDiscPrice(), product.getDiscPrice());
-                assertTrue(product.getTag().contains("vintage"));
-                assertTrue(product.getTag().contains("white"));
-                assertTrue(product.getTag().contains("indoor"));
-            });
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andDo(result -> {
+                    Product product = objectMapper.readValue(result.getResponse().getContentAsString(), Product.class);
+                    assertEquals(productId.toString(), product.getId());
+                    assertEquals(product1.getProductName(), product.getProductName());
+                    assertEquals(product1.getPicture(), product.getPicture());
+                    assertEquals(product1.getDescription(), product.getDescription());
+                    assertEquals(product1.getRealPrice(), product.getRealPrice());
+                    assertEquals(product1.getDiscPrice(), product.getDiscPrice());
+                    assertTrue(product.getTag().contains("vintage"));
+                    assertTrue(product.getTag().contains("white"));
+                    assertTrue(product.getTag().contains("indoor"));
+                });
         verify(productService, times(1)).getProductById(productId.toString());
     }
 
@@ -135,8 +142,10 @@ public class ProductControllerTest {
         when(productService.delete(productId.toString())).thenReturn(productId.toString());
         mvc.perform(delete("/admin/product/delete/" + productId.toString()))
                 .andExpect(status().isOk())
-                .andDo(result -> {String responseBody = result.getResponse().getContentAsString();
-                assertEquals(expectedResult, responseBody);});
+                .andDo(result -> {
+                    String responseBody = result.getResponse().getContentAsString();
+                    assertEquals(expectedResult, responseBody);
+                });
     }
 
     @Test
@@ -145,7 +154,9 @@ public class ProductControllerTest {
         mvc.perform(get("/admin/product/list"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andDo(result -> {List<Product> products = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<List<Product>>() {});
+                .andDo(result -> {
+                    List<Product> products = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<List<Product>>() {
+                    });
                     assertNotNull(products);
                     Product product = products.getFirst();
                     assertEquals(product1.getProductName(), product.getProductName());
@@ -157,5 +168,43 @@ public class ProductControllerTest {
                     assertTrue(product.getTag().contains("white"));
                     assertTrue(product.getTag().contains("indoor"));
                 });
+    }
+
+    @Test
+    public void testIncrementSalesFails() throws Exception {
+        HashMap<String, Integer> productsSold = new HashMap<>();
+        productsSold.put("prod1", 10);
+        productsSold.put("prod2", 20);
+
+        when(productService.incrementSales(any(HashMap.class)))
+                .thenAnswer(invocation -> CompletableFuture.failedFuture(new IllegalArgumentException("""
+                        Error incrementing sales for product ID: prod1
+                        Error incrementing sales for product ID: prod2""")));
+
+        MvcResult mvcResult = mvc.perform(post("/admin/product/sold").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(productsSold)))
+                .andReturn();
+
+        mvcResult.getAsyncResult();
+        assertEquals(200, mvcResult.getResponse().getStatus());
+        verify(productService, times(1)).incrementSales(productsSold);
+    }
+
+    @Test
+    public void testIncrementSalesSuccess() throws Exception {
+        HashMap<String, Integer> productsSold = new HashMap<>();
+        productsSold.put("prod1", 10);
+        productsSold.put("prod2", 20);
+
+        when(productService.incrementSales(any(HashMap.class)))
+                .thenAnswer(invocation -> CompletableFuture.completedFuture("success"));
+
+        MvcResult mvcResult = mvc.perform(post("/admin/product/sold").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(productsSold)))
+                .andReturn();
+
+        mvcResult.getAsyncResult();
+        assertEquals(200, mvcResult.getResponse().getStatus());
+        verify(productService, times(1)).incrementSales(productsSold);
     }
 }
