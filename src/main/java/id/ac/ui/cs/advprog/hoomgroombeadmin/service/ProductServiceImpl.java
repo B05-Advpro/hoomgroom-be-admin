@@ -8,6 +8,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -121,8 +122,29 @@ public class ProductServiceImpl implements ProductService{
     @Async
     @Transactional
     @Override
-    public CompletableFuture<Integer> incrementSales(String productId, int quantity) {
-        Integer result = productRepository.incrementSales(productId, quantity);
-        return CompletableFuture.completedFuture(result);
+    public CompletableFuture<String> incrementSales(HashMap<String, Integer> productsSold) throws IllegalArgumentException{
+        StringBuilder allResult = new StringBuilder();
+        boolean error = false;
+        for (String productId: productsSold.keySet()){
+            try{
+                int result = productRepository.incrementSales(productId, productsSold.get(productId));
+                if (result == 0){
+                    throw new IllegalArgumentException();
+                }
+                allResult.append("Sales successfully incremented for product ID: ");
+                allResult.append(productId);
+                allResult.append("\n");
+
+            } catch (Exception e) {
+                allResult.append("Error incrementing sales for product ID: ");
+                allResult.append(productId);
+                allResult.append("\n");
+                error = true;
+            }
+        }
+        if (error){
+            return CompletableFuture.failedFuture(new IllegalArgumentException(allResult.toString()));
+        }
+        return CompletableFuture.completedFuture(allResult.toString());
     }
 }
