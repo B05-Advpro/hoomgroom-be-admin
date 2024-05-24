@@ -7,6 +7,7 @@ import id.ac.ui.cs.advprog.hoomgroombeadmin.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 
 @RestController
@@ -80,5 +82,12 @@ public class ProductRestController {
         }
 
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @PostMapping("/sold")
+    @Async
+    public CompletableFuture<String> incrementSales(
+            @RequestBody HashMap<String, Integer> productsSold){
+        return service.incrementSales(productsSold);
     }
 }
