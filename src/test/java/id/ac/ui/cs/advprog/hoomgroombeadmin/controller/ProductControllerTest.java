@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import id.ac.ui.cs.advprog.hoomgroombeadmin.controller.ProductRestController;
 
 import id.ac.ui.cs.advprog.hoomgroombeadmin.model.Product;
+import id.ac.ui.cs.advprog.hoomgroombeadmin.service.JwtService;
 import id.ac.ui.cs.advprog.hoomgroombeadmin.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,9 @@ public class ProductControllerTest {
     @Mock
     private ProductService productService;
 
+    @Mock
+    private JwtService jwtService;
+
     @InjectMocks
     private ProductRestController controller;
 
@@ -62,7 +66,11 @@ public class ProductControllerTest {
     @Test
     public void createProductTest() throws Exception {
         when(productService.save(any(Product.class))).thenReturn(product1);
+        when(jwtService.isTokenValid(anyString())).thenReturn(true);
+        when(jwtService.extractRole(anyString())).thenReturn("ADMIN");
+
         mvc.perform(post("/admin/product/create").contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer jwtToken")
                         .content(objectMapper.writeValueAsString(product1)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -79,13 +87,45 @@ public class ProductControllerTest {
                 });
 
         verify(productService, times(1)).save(any(Product.class));
+        verify(jwtService, times(1)).isTokenValid(anyString());
+        verify(jwtService, times(1)).extractRole(anyString());
+    }
+
+    @Test
+    public void createProductNotAdminTest() throws Exception {
+        when(jwtService.isTokenValid(anyString())).thenReturn(true);
+        when(jwtService.extractRole(anyString())).thenReturn("USER");
+
+        mvc.perform(post("/admin/product/create").contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer jwtToken")
+                .content(objectMapper.writeValueAsString(product1)))
+                .andExpect(status().isForbidden());
+
+        verify(jwtService, times(1)).isTokenValid(anyString());
+        verify(jwtService, times(1)).extractRole(anyString());
+    }
+
+    @Test
+    public void createProductNotLoggedInTest() throws Exception {
+        when(jwtService.isTokenValid(anyString())).thenReturn(false);
+
+        mvc.perform(post("/admin/product/create").contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer jwtToken")
+                        .content(objectMapper.writeValueAsString(product1)))
+                .andExpect(status().isForbidden());
+
+        verify(jwtService, times(1)).isTokenValid(anyString());
     }
 
     @Test
     public void updateProductPostTest() throws Exception {
         when(productService.save(any(Product.class))).thenReturn(product1);
+        when(jwtService.isTokenValid(anyString())).thenReturn(true);
+        when(jwtService.extractRole(anyString())).thenReturn("ADMIN");
+
         mvc.perform(post("/admin/product/update/save")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer jwtToken")
                         .content(objectMapper.writeValueAsString(product1)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -101,6 +141,36 @@ public class ProductControllerTest {
                     assertTrue(product.getTag().contains("indoor"));
                 });
         verify(productService, times(1)).save(any(Product.class));
+        verify(jwtService, times(1)).isTokenValid(anyString());
+        verify(jwtService, times(1)).extractRole(anyString());
+    }
+
+    @Test
+    public void updateProductPostNotAdminTest() throws Exception {
+        when(jwtService.isTokenValid(anyString())).thenReturn(true);
+        when(jwtService.extractRole(anyString())).thenReturn("USER");
+
+        mvc.perform(post("/admin/product/update/save")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer jwtToken")
+                .content(objectMapper.writeValueAsString(product1)))
+                .andExpect(status().isForbidden());
+
+        verify(jwtService, times(1)).isTokenValid(anyString());
+        verify(jwtService, times(1)).extractRole(anyString());
+    }
+
+    @Test
+    public void updateProductPostNotLoggedInTest() throws Exception {
+        when(jwtService.isTokenValid(anyString())).thenReturn(false);
+
+        mvc.perform(post("/admin/product/update/save")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer jwtToken")
+                .content(objectMapper.writeValueAsString(product1)))
+                .andExpect(status().isForbidden());
+
+        verify(jwtService, times(1)).isTokenValid(anyString());
     }
 
     @Test
@@ -108,8 +178,11 @@ public class ProductControllerTest {
         UUID productId = new UUID(32, 10);
         product1.setId(productId.toString());
         when(productService.getProductById(productId.toString())).thenReturn(product1);
+        when(jwtService.isTokenValid(anyString())).thenReturn(true);
+        when(jwtService.extractRole(anyString())).thenReturn("ADMIN");
 
-        mvc.perform(get("/admin/product/update/" + productId.toString()))
+        mvc.perform(get("/admin/product/update/" + productId.toString())
+                        .header("Authorization", "Bearer jwtToken"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andDo(result -> {
@@ -125,14 +198,46 @@ public class ProductControllerTest {
                     assertTrue(product.getTag().contains("indoor"));
                 });
         verify(productService, times(1)).getProductById(productId.toString());
+        verify(jwtService, times(1)).isTokenValid(anyString());
+        verify(jwtService, times(1)).extractRole(anyString());
     }
 
     @Test
     public void updateProductPageIdNotFoundTest() throws Exception {
         when(productService.getProductById(anyString())).thenReturn(null);
+        when(jwtService.isTokenValid(anyString())).thenReturn(true);
+        when(jwtService.extractRole(anyString())).thenReturn("ADMIN");
 
-        mvc.perform(get("/admin/product/update/" + "ABC123"))
+        mvc.perform(get("/admin/product/update/" + "ABC123")
+                        .header("Authorization", "Bearer jwtToken"))
                 .andExpect(status().isBadRequest());
+
+        verify(jwtService, times(1)).isTokenValid(anyString());
+        verify(jwtService, times(1)).extractRole(anyString());
+    }
+
+    @Test
+    public void updateProductPageNotAdminTest() throws Exception {
+        when(jwtService.isTokenValid(anyString())).thenReturn(true);
+        when(jwtService.extractRole(anyString())).thenReturn("USER");
+
+        mvc.perform(get("/admin/product/update/" + "ABC123")
+                        .header("Authorization", "Bearer jwtToken"))
+                .andExpect(status().isForbidden());
+
+        verify(jwtService, times(1)).isTokenValid(anyString());
+        verify(jwtService, times(1)).extractRole(anyString());
+    }
+
+    @Test
+    public void updateProductPageNotLoggedInTest() throws Exception {
+        when(jwtService.isTokenValid(anyString())).thenReturn(false);
+
+        mvc.perform(get("/admin/product/update/" + "ABC123")
+                        .header("Authorization", "Bearer jwtToken"))
+                .andExpect(status().isForbidden());
+
+        verify(jwtService, times(1)).isTokenValid(anyString());
     }
 
     @Test
@@ -140,12 +245,45 @@ public class ProductControllerTest {
         UUID productId = new UUID(32, 10);
         String expectedResult = "Deleted product with ID " + productId;
         when(productService.delete(productId.toString())).thenReturn(productId.toString());
-        mvc.perform(delete("/admin/product/delete/" + productId.toString()))
+        when(jwtService.isTokenValid(anyString())).thenReturn(true);
+        when(jwtService.extractRole(anyString())).thenReturn("ADMIN");
+
+        mvc.perform(delete("/admin/product/delete/" + productId.toString())
+                        .header("Authorization", "Bearer jwtToken"))
                 .andExpect(status().isOk())
                 .andDo(result -> {
                     String responseBody = result.getResponse().getContentAsString();
                     assertEquals(expectedResult, responseBody);
                 });
+
+        verify(jwtService, times(1)).isTokenValid(anyString());
+        verify(jwtService, times(1)).extractRole(anyString());
+    }
+
+    @Test
+    public void deleteProductNotAdminTest() throws Exception {
+        UUID productId = new UUID(32, 10);
+        when(jwtService.isTokenValid(anyString())).thenReturn(true);
+        when(jwtService.extractRole(anyString())).thenReturn("USER");
+
+        mvc.perform(delete("/admin/product/delete/" + productId.toString())
+                        .header("Authorization", "Bearer jwtToken"))
+                .andExpect(status().isForbidden());
+
+        verify(jwtService, times(1)).isTokenValid(anyString());
+        verify(jwtService, times(1)).extractRole(anyString());
+    }
+
+    @Test
+    public void deleteProductNotLoggedInTest() throws Exception {
+        UUID productId = new UUID(32, 10);
+        when(jwtService.isTokenValid(anyString())).thenReturn(false);
+
+        mvc.perform(delete("/admin/product/delete/" + productId.toString())
+                        .header("Authorization", "Bearer jwtToken"))
+                .andExpect(status().isForbidden());
+
+        verify(jwtService, times(1)).isTokenValid(anyString());
     }
 
     @Test
@@ -175,6 +313,7 @@ public class ProductControllerTest {
         HashMap<String, Integer> productsSold = new HashMap<>();
         productsSold.put("prod1", 10);
         productsSold.put("prod2", 20);
+        when(jwtService.isTokenValid(anyString())).thenReturn(true);
 
         when(productService.incrementSales(any(HashMap.class)))
                 .thenAnswer(invocation -> CompletableFuture.failedFuture(new IllegalArgumentException("""
@@ -182,6 +321,7 @@ public class ProductControllerTest {
                         Error incrementing sales for product ID: prod2""")));
 
         MvcResult mvcResult = mvc.perform(post("/admin/product/sold").contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer jwtToken")
                         .content(objectMapper.writeValueAsString(productsSold)))
                 .andReturn();
 
@@ -195,11 +335,13 @@ public class ProductControllerTest {
         HashMap<String, Integer> productsSold = new HashMap<>();
         productsSold.put("prod1", 10);
         productsSold.put("prod2", 20);
+        when(jwtService.isTokenValid(anyString())).thenReturn(true);
 
         when(productService.incrementSales(any(HashMap.class)))
                 .thenAnswer(invocation -> CompletableFuture.completedFuture("success"));
 
         MvcResult mvcResult = mvc.perform(post("/admin/product/sold").contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer jwtToken")
                         .content(objectMapper.writeValueAsString(productsSold)))
                 .andReturn();
 
