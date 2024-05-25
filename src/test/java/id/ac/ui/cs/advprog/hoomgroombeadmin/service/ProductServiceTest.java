@@ -458,26 +458,35 @@ public class ProductServiceTest {
     }
 
     @Test
-    void incrementSalesSuccess() throws ExecutionException, InterruptedException {
-        String productId = "ABC123";
-        int quantity = 3;
+    void testIncrementSalesSuccess() throws ExecutionException, InterruptedException {
+        HashMap<String, Integer> productsSold = new HashMap<>();
+        productsSold.put("ABC123", 10);
+        productsSold.put("123ABC", 20);
         when(productRepository.incrementSales(anyString(), anyInt())).thenReturn(1);
 
-        CompletableFuture<Integer> future = service.incrementSales(productId, quantity);
-        int result = future.get();
+        CompletableFuture<String> future = service.incrementSales(productsSold);
+        String result = future.get();
 
-        assertEquals(1, result);
+        verify(productRepository, times(2)).incrementSales(anyString(), anyInt());
+        assertTrue(result.contains("success"));
     }
 
     @Test
-    void incrementSalesFailed() throws ExecutionException, InterruptedException {
-        String productId = "ABC123";
-        int quantity = 3;
+    void testIncrementSalesFailed() {
+        HashMap<String, Integer> productsSold = new HashMap<>();
+        productsSold.put("ABC123", 10);
+        productsSold.put("123ABC", 20);
         when(productRepository.incrementSales(anyString(), anyInt())).thenReturn(0);
 
-        CompletableFuture<Integer> future = service.incrementSales(productId, quantity);
-        int result = future.get();
+        CompletableFuture<String> future = service.incrementSales(productsSold);
 
-        assertEquals(0, result);
+        try {
+            future.get();
+        } catch (ExecutionException e) {
+            assertInstanceOf(IllegalArgumentException.class, e.getCause());
+            assertTrue(e.getCause().getMessage().contains("Error"));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

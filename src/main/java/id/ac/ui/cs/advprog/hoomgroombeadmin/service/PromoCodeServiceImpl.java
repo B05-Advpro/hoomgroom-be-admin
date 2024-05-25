@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -16,25 +17,17 @@ PromoCodeServiceImpl implements PromoCodeService{
     PromoCodeRepository promoCodeRepository;
 
     @Override
-    public PromoCode create(PromoCode promoCode) {
+    public PromoCode save(PromoCode promoCode) {
         return promoCodeRepository.save(promoCode);
     }
 
     @Override
-    public PromoCode edit(PromoCode editedPromoCode) {
-        if (!promoCodeRepository.existsById(editedPromoCode.getCodeId())){
-            return null;
-        }
-        promoCodeRepository.save(editedPromoCode);
-        return editedPromoCode;
-    }
-
-    @Override
     public PromoCode getPromoCodeById(String promoCodeId) {
-        if (!promoCodeRepository.existsById(promoCodeId)){
+        try {
+            return promoCodeRepository.findById(promoCodeId).get();
+        } catch (NoSuchElementException e){
             return null;
         }
-        return promoCodeRepository.findById(promoCodeId).get();
     }
 
     @Override
@@ -44,9 +37,6 @@ PromoCodeServiceImpl implements PromoCodeService{
 
     @Override
     public String delete(String promoCodeId) {
-        if (!promoCodeRepository.existsById(promoCodeId)){
-            return null;
-        }
         promoCodeRepository.deleteById(promoCodeId);
         return promoCodeId;
     }

@@ -4,13 +4,12 @@ import id.ac.ui.cs.advprog.hoomgroombeadmin.model.Product;
 import id.ac.ui.cs.advprog.hoomgroombeadmin.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -121,8 +120,33 @@ public class ProductServiceImpl implements ProductService{
     @Async
     @Transactional
     @Override
-    public CompletableFuture<Integer> incrementSales(String productId, int quantity) {
-        Integer result = productRepository.incrementSales(productId, quantity);
-        return CompletableFuture.completedFuture(result);
+    public CompletableFuture<String> incrementSales(Map<String, Integer> productsSold) throws IllegalArgumentException{
+        StringBuilder allResult = new StringBuilder();
+        boolean error = false;
+        String productId;
+
+        for (Map.Entry<String, Integer> entry: productsSold.entrySet()){
+            try{
+                productId = entry.getKey();
+                int result = productRepository.incrementSales(productId, productsSold.get(productId));
+                if (result == 0){
+                    throw new IllegalArgumentException();
+                }
+                allResult.append("Sales successfully incremented for product ID: ");
+                allResult.append(productId);
+                allResult.append("\n");
+
+            } catch (Exception e) {
+                productId = entry.getKey();
+                allResult.append("Error incrementing sales for product ID: ");
+                allResult.append(productId);
+                allResult.append("\n");
+                error = true;
+            }
+        }
+        if (error){
+            return CompletableFuture.failedFuture(new IllegalArgumentException(allResult.toString()));
+        }
+        return CompletableFuture.completedFuture(allResult.toString());
     }
 }
