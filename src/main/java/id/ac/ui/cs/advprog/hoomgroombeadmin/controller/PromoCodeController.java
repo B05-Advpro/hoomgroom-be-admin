@@ -74,4 +74,9 @@ public class PromoCodeController {
         List<PromoCode> result = service.getAll();
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
 }
