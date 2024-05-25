@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/admin/promo-code")
 public class PromoCodeController {
 
