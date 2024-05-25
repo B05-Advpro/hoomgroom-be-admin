@@ -36,9 +36,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           PRODUCTION: ${{ secrets.PRODUCTION }}
-          JDBC_DATABASE_PASSWORD: ${{ secrets.JDBC_DATABASE_PASSWORD }}
-          JDBC_DATABASE_URL: ${{ secrets.JDBC_DATABASE_URL }}
-          JDBC_DATABASE_USERNAME: ${{ secrets.JDBC_DATABASE_USERNAME }}
+          JDBC_DATABASE_PASSWORD: ${{ secrets.TEST_DATABASE_PASSWORD }}
+          JDBC_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+          JDBC_DATABASE_USERNAME: ${{ secrets.TEST_DATABASE_USERNAME }}
         run: ./gradlew build sonar --info
       - name: Run tests with coverage
         run: ./gradlew test jacocoTestReport

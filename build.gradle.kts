@@ -3,6 +3,7 @@ plugins {
     id("org.springframework.boot") version "3.2.4"
     id("io.spring.dependency-management") version "1.1.4"
     jacoco
+    id("org.sonarqube") version "4.4.1.3373"
 }
 
 group = "id.ac.ui.cs.advprog"
@@ -11,6 +12,14 @@ java.sourceCompatibility = JavaVersion.VERSION_21
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "B05-Advpro_hoomgroom-be-admin")
+        property("sonar.organization", "b05-advpro")
+        property("sonar.host.url", "https://sonarcloud.io")
+    }
 }
 
 val seleniumJavaVersion = "4.14.1"
@@ -78,13 +87,10 @@ tasks.test {
     finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
 }
 tasks.jacocoTestReport {
-    classDirectories.setFrom(files(classDirectories.files.map {
-        fileTree(it) { exclude("**/*Application**") }
-    }))
     dependsOn(tasks.test) // tests are required to run before generating the report
     reports {
-        xml.required.set(false)
-        csv.required.set(false)
+        xml.required.set(true)
+        csv.required.set(true)
         html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
     }
 }
