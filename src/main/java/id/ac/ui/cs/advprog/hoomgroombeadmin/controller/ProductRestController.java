@@ -12,11 +12,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-
 
 @RestController
 @RequestMapping("/admin/product")
@@ -28,12 +26,12 @@ public class ProductRestController {
     @Autowired
     private JwtService jwtService;
 
-    private ProductFilterContext productFilterContext;
+    private static final String ROLE = "ADMIN";
 
     @PostMapping("/create")
     public ResponseEntity<Product> createProductPost(@RequestHeader (value = "Authorization") String token, @RequestBody Product product) throws JsonProcessingException {
         token = token.substring(7);
-        if (!jwtService.isTokenValid(token) || jwtService.extractRole(token) != "ADMIN"){
+        if (!jwtService.isTokenValid(token) || !jwtService.extractRole(token).equals(ROLE)){
             return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         }
         Product result = service.save(product);
@@ -43,7 +41,7 @@ public class ProductRestController {
     @PostMapping("/update/save")
     public ResponseEntity<Product> updateProductPost(@RequestHeader (value = "Authorization") String token, @RequestBody Product product) {
         token = token.substring(7);
-        if (!jwtService.isTokenValid(token) || jwtService.extractRole(token) != "ADMIN"){
+        if (!jwtService.isTokenValid(token) || !jwtService.extractRole(token).equals(ROLE)){
             return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         }
         Product result = service.save(product);
@@ -53,7 +51,7 @@ public class ProductRestController {
     @GetMapping("/update/{productId}")
     public ResponseEntity<Product> updateProductPage(@RequestHeader (value = "Authorization") String token, @PathVariable String productId){
         token = token.substring(7);
-        if (!jwtService.isTokenValid(token) || jwtService.extractRole(token) != "ADMIN"){
+        if (!jwtService.isTokenValid(token) || !jwtService.extractRole(token).equals(ROLE)){
             return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         }
         Product result = service.getProductById(productId);
@@ -66,7 +64,7 @@ public class ProductRestController {
     @DeleteMapping("/delete/{productId}")
     public ResponseEntity<String> deleteProduct(@RequestHeader (value = "Authorization") String token, @PathVariable String productId){
         token = token.substring(7);
-        if (!jwtService.isTokenValid(token) || jwtService.extractRole(token) != "ADMIN"){
+        if (!jwtService.isTokenValid(token) || !jwtService.extractRole(token).equals(ROLE)){
             return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         }
         String result = "Deleted product with ID " + service.delete(productId);
@@ -108,7 +106,7 @@ public class ProductRestController {
     @Async
     public CompletableFuture<String> incrementSales(
             @RequestHeader (value = "Authorization") String token,
-            @RequestBody HashMap<String, Integer> productsSold){
+            @RequestBody Map<String, Integer> productsSold){
         token = token.substring(7);
         if (!jwtService.isTokenValid(token)){
             return CompletableFuture.failedFuture(new IllegalAccessException("Log in needed"));

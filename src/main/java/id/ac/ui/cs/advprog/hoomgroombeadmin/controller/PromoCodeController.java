@@ -20,10 +20,12 @@ public class PromoCodeController {
     @Autowired
     private JwtService jwtService;
 
+    private static final String ROLE = "ADMIN";
+
     @PostMapping("/create")
     public ResponseEntity<PromoCode> createPromoCodePost(@RequestHeader (value = "Authorization") String token, @RequestBody PromoCode promoCode) {
         token = token.substring(7);
-        if (!jwtService.isTokenValid(token) || jwtService.extractRole(token) != "ADMIN"){
+        if (!jwtService.isTokenValid(token) || !jwtService.extractRole(token).equals(ROLE)){
             return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         }
         PromoCode result = service.save(promoCode);
@@ -33,7 +35,7 @@ public class PromoCodeController {
     @PostMapping("/update/save")
     public ResponseEntity<PromoCode> updatePromoCodePost(@RequestHeader (value = "Authorization") String token, @RequestBody PromoCode promoCode) {
         token = token.substring(7);
-        if (!jwtService.isTokenValid(token) || jwtService.extractRole(token) != "ADMIN"){
+        if (!jwtService.isTokenValid(token) || !jwtService.extractRole(token).equals(ROLE)){
             return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         }
         PromoCode result = service.save(promoCode);
@@ -43,12 +45,12 @@ public class PromoCodeController {
     @GetMapping("/update/{promoCodeId}")
     public ResponseEntity<PromoCode> updatePromoCodePage(@RequestHeader (value = "Authorization") String token, @PathVariable String promoCodeId){
         token = token.substring(7);
-        if (!jwtService.isTokenValid(token) || jwtService.extractRole(token) != "ADMIN"){
+        if (!jwtService.isTokenValid(token) || !jwtService.extractRole(token).equals(ROLE)){
             return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         }
         PromoCode result = service.getPromoCodeById(promoCodeId);
         if (result == null){
-            return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -56,7 +58,7 @@ public class PromoCodeController {
     @DeleteMapping("/delete/{promoCodeId}")
     public ResponseEntity<String> deletePromoCode(@RequestHeader (value = "Authorization") String token, @PathVariable String promoCodeId){
         token = token.substring(7);
-        if (!jwtService.isTokenValid(token) || jwtService.extractRole(token) != "ADMIN"){
+        if (!jwtService.isTokenValid(token) || !jwtService.extractRole(token).equals(ROLE)){
             return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         }
         String result = "Deleted promo code with ID " + service.delete(promoCodeId);
@@ -66,7 +68,7 @@ public class PromoCodeController {
     @GetMapping("/manage")
     public ResponseEntity<List<PromoCode>> managePromoCode(@RequestHeader (value = "Authorization") String token){
         token = token.substring(7);
-        if (!jwtService.isTokenValid(token) || jwtService.extractRole(token) != "ADMIN"){
+        if (!jwtService.isTokenValid(token) || !jwtService.extractRole(token).equals(ROLE)){
             return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         }
         List<PromoCode> result = service.getAll();
