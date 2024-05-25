@@ -15,6 +15,7 @@ import java.util.List;
 
 
 @RestController
+@CrossOrigin
 @RequestMapping("/admin/product")
 public class ProductRestController {
 
