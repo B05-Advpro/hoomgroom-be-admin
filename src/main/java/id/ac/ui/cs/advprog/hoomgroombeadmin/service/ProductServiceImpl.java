@@ -39,9 +39,11 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public String delete(String productId) {
-        productRepository.deleteById(productId);
-        return productId;
+    public CompletableFuture<String> delete(String productId) {
+        return CompletableFuture.supplyAsync(() -> {
+            productRepository.deleteById(productId);
+            return productId;
+        });
     }
 
     /* Will return empty list if there are no products found

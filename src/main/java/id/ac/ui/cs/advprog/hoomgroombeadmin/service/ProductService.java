@@ -8,7 +8,7 @@ import java.util.concurrent.CompletableFuture;
 
 public interface ProductService {
     public Product save(Product product);
-    public String delete(String productId);
+    public CompletableFuture<String> delete(String productId);
     public CompletableFuture<List<Product>> getAll();
     public Product getProductById(String productId);
     public List<Product> getProductsByPrice(int amount, boolean fromLowest);
