@@ -12,12 +12,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.ArgumentMatchers.any;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ProductServiceTest {
+class ProductServiceTest {
     @Mock
     ProductRepository productRepository;
     @InjectMocks
@@ -41,7 +43,7 @@ public class ProductServiceTest {
     void testCreateAndFindAll(){
         when(productRepository.save(any(Product.class))).thenReturn(product1);
         product1.setId("6f42392e-40a2-475a-9c00-c667307c20d8");
-        service.create(product1);
+        service.save(product1);
 
         verify(productRepository,times(1)).save(product1);
 
@@ -68,10 +70,8 @@ public class ProductServiceTest {
     @Test
     void testDelete(){
         String productId = (new UUID(32, 10)).toString();
-        when(productRepository.existsById(productId)).thenReturn(true);
 
         String result = service.delete(productId);
-        verify(productRepository,times(1)).existsById(productId);
         verify(productRepository, times(1)).deleteById(productId);
         assertEquals(productId, result);
     }
@@ -79,21 +79,16 @@ public class ProductServiceTest {
     @Test
     void testDeleteIfIdNotFound(){
         String productId = (new UUID(32, 10)).toString();
-        when(productRepository.existsById(productId)).thenReturn(false);
-
-        assertNull(service.delete(productId));
-        verify(productRepository,times(1)).existsById(productId);
+        assertEquals(productId, service.delete(productId));
     }
 
     @Test
     void testGetProductByIdFound(){
         product1.setId("eb558e9f-1c39-460e-8860-71af6af63bd6");
-        when(productRepository.existsById("eb558e9f-1c39-460e-8860-71af6af63bd6")).thenReturn(true);
         when(productRepository.findById("eb558e9f-1c39-460e-8860-71af6af63bd6")).thenReturn(Optional.ofNullable(product1));
 
         Product savedProduct = service.getProductById("eb558e9f-1c39-460e-8860-71af6af63bd6");
 
-        verify(productRepository,times(1)).existsById("eb558e9f-1c39-460e-8860-71af6af63bd6");
         verify(productRepository,times(1)).findById("eb558e9f-1c39-460e-8860-71af6af63bd6");
         assertEquals("eb558e9f-1c39-460e-8860-71af6af63bd6", savedProduct.getId());
         assertEquals("Furniture 1", savedProduct.getProductName());
@@ -109,10 +104,7 @@ public class ProductServiceTest {
 
     @Test
     void testGetProductByIdNotFound(){
-        when(productRepository.existsById("0000")).thenReturn(false);
-
         assertNull(service.getProductById("0000"));
-        verify(productRepository,times(1)).existsById("0000");
     }
 
     @Test
@@ -127,8 +119,7 @@ public class ProductServiceTest {
         product1.setDiscPrice(2000000);
 
         when(productRepository.save(product1)).thenReturn(product1);
-        when(productRepository.existsById("eb558e9f-1c39-460e-8860-71af6af63bd6")).thenReturn(true);
-        Product result = service.edit(product1);
+        Product result = service.save(product1);
 
         verify(productRepository,times(1)).save(product1);
         assertEquals(product1.getId(), result.getId());
@@ -139,16 +130,6 @@ public class ProductServiceTest {
         assertEquals(product1.getRealPrice(), result.getRealPrice());
         assertEquals(product1.getTag().getFirst(), product1.getTag().getFirst());
         assertEquals(product1.getTag().getLast(), product1.getTag().getLast());
-    }
-
-    @Test
-    void testEditIfIdNotFound(){
-        Product product = new Product();
-        product.setId("11111");
-        when(productRepository.existsById("11111")).thenReturn(false);
-
-        assertNull(service.edit(product));
-        verify(productRepository, times(1)).existsById("11111");
     }
 
     @Test
@@ -474,5 +455,38 @@ public class ProductServiceTest {
         assertEquals("Product2", result.getFirst().getProductName());
         assertEquals("Product1", result.get(1).getProductName());
 
+    }
+
+    @Test
+    void testIncrementSalesSuccess() throws ExecutionException, InterruptedException {
+        HashMap<String, Integer> productsSold = new HashMap<>();
+        productsSold.put("ABC123", 10);
+        productsSold.put("123ABC", 20);
+        when(productRepository.incrementSales(anyString(), anyInt())).thenReturn(1);
+
+        CompletableFuture<String> future = service.incrementSales(productsSold);
+        String result = future.get();
+
+        verify(productRepository, times(2)).incrementSales(anyString(), anyInt());
+        assertTrue(result.contains("success"));
+    }
+
+    @Test
+    void testIncrementSalesFailed() {
+        HashMap<String, Integer> productsSold = new HashMap<>();
+        productsSold.put("ABC123", 10);
+        productsSold.put("123ABC", 20);
+        when(productRepository.incrementSales(anyString(), anyInt())).thenReturn(0);
+
+        CompletableFuture<String> future = service.incrementSales(productsSold);
+
+        try {
+            future.get();
+        } catch (ExecutionException e) {
+            assertInstanceOf(IllegalArgumentException.class, e.getCause());
+            assertTrue(e.getCause().getMessage().contains("Error"));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

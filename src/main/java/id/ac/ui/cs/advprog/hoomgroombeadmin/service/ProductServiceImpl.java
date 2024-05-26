@@ -2,40 +2,41 @@ package id.ac.ui.cs.advprog.hoomgroombeadmin.service;
 
 import id.ac.ui.cs.advprog.hoomgroombeadmin.model.Product;
 import id.ac.ui.cs.advprog.hoomgroombeadmin.repository.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Service
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService{
 
-    @Autowired
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
     private final ProductFilterContext filterContext = new ProductFilterContext(null);
 
     @Override
-    public Product create(Product product) {
+    public Product save(Product product) {
         return productRepository.save(product);
     }
 
     @Override
-    public Product edit(Product editedProduct) {
-        if (!productRepository.existsById(editedProduct.getId())){
-            return null;
-        }
-        productRepository.save(editedProduct);
-        return editedProduct;
-    }
-
-    @Override
     public Product getProductById(String productId) {
-        if (!productRepository.existsById(productId)){
+        try {
+            Optional<Product> result = productRepository.findById(productId);
+            if (result.isEmpty()){
+                throw new NoSuchElementException("The Id doesn't exist");
+            }
+            return result.get();
+        } catch (NoSuchElementException e){
             return null;
         }
-        return productRepository.findById(productId).get();
     }
 
     @Override
@@ -45,9 +46,6 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public String delete(String productId) {
-        if (!productRepository.existsById(productId)){
-            return null;
-        }
         productRepository.deleteById(productId);
         return productId;
     }
@@ -124,4 +122,36 @@ public class ProductServiceImpl implements ProductService{
         }
     }
 
+    @Async
+    @Transactional
+    @Override
+    public CompletableFuture<String> incrementSales(Map<String, Integer> productsSold) throws IllegalArgumentException{
+        StringBuilder allResult = new StringBuilder();
+        boolean error = false;
+        String productId;
+
+        for (Map.Entry<String, Integer> entry: productsSold.entrySet()){
+            try{
+                productId = entry.getKey();
+                int result = productRepository.incrementSales(productId, productsSold.get(productId));
+                if (result == 0){
+                    throw new IllegalArgumentException();
+                }
+                allResult.append("Sales successfully incremented for product ID: ");
+                allResult.append(productId);
+                allResult.append("\n");
+
+            } catch (Exception e) {
+                productId = entry.getKey();
+                allResult.append("Error incrementing sales for product ID: ");
+                allResult.append(productId);
+                allResult.append("\n");
+                error = true;
+            }
+        }
+        if (error){
+            return CompletableFuture.failedFuture(new IllegalArgumentException(allResult.toString()));
+        }
+        return CompletableFuture.completedFuture(allResult.toString());
+    }
 }
