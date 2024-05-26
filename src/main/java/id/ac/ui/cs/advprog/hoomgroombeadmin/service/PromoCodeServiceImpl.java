@@ -17,7 +17,11 @@ public class PromoCodeServiceImpl implements PromoCodeService{
 
     @Override
     public PromoCode save(PromoCode promoCode) {
-        return promoCodeRepository.save(promoCode);
+        try{
+            return promoCodeRepository.save(promoCode);
+        } catch (Exception e){
+            throw new IllegalArgumentException("Already exists a promo code with this name");
+        }
     }
 
     @Override
