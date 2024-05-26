@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -241,10 +242,11 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void deleteProductTest() throws Exception {
+    public void deleteProductTest() throws Exception, ExecutionException, InterruptedException {
         UUID productId = new UUID(32, 10);
-        String expectedResult = "Deleted product with ID " + productId;
-        when(productService.delete(productId.toString())).thenReturn(productId.toString());
+        CompletableFuture<String> completableFuture = CompletableFuture.completedFuture(productId.toString());
+        String expectedResult = "Deleted product with ID " + productId.toString();
+        when(productService.delete(productId.toString())).thenReturn(CompletableFuture.completedFuture(productId.toString()));
         when(jwtService.isTokenValid(anyString())).thenReturn(true);
         when(jwtService.extractRole(anyString())).thenReturn("ADMIN");
 

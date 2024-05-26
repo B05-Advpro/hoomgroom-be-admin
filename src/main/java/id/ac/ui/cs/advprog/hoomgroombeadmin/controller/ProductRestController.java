@@ -63,12 +63,12 @@ public class ProductRestController {
     }
 
     @DeleteMapping("/delete/{productId}")
-    public ResponseEntity<String> deleteProduct(@RequestHeader (value = "Authorization") String token, @PathVariable String productId){
+    public ResponseEntity<String> deleteProduct(@RequestHeader (value = "Authorization") String token, @PathVariable String productId) throws ExecutionException, InterruptedException {
         token = token.substring(7);
         if (!jwtService.isTokenValid(token) || !jwtService.extractRole(token).equals(ROLE)){
             return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         }
-        String result = "Deleted product with ID " + service.delete(productId);
+        String result = "Deleted product with ID " + service.delete(productId).get();
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

@@ -68,12 +68,12 @@ public class ProductServiceTest {
     }
 
     @Test
-    void testDelete(){
+    void testDelete() throws ExecutionException, InterruptedException{
         String productId = (new UUID(32, 10)).toString();
 
-        String result = service.delete(productId);
+        CompletableFuture<String> result = service.delete(productId);
         verify(productRepository, times(1)).deleteById(productId);
-        assertEquals(productId, result);
+        assertEquals(productId, result.get());
     }
 
     @Test
