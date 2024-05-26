@@ -83,6 +83,10 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Run tests
+        env:
+          JDBC_DATABASE_PASSWORD: ${{ secrets.TEST_DATABASE_PASSWORD }}
+          JDBC_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+          JDBC_DATABASE_USERNAME: ${{ secrets.TEST_DATABASE_USERNAME }}
         run: |
           gradle check --info --stacktrace
           gradle test
