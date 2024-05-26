@@ -40,7 +40,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void testCreateAndFindAll(){
+    void testCreateAndFindAll() throws ExecutionException, InterruptedException{
         when(productRepository.save(any(Product.class))).thenReturn(product1);
         product1.setId("6f42392e-40a2-475a-9c00-c667307c20d8");
         service.save(product1);
@@ -50,8 +50,8 @@ public class ProductServiceTest {
         List<Product> products = Arrays.asList(product1);
         when(productRepository.findAll()).thenReturn(products);
 
-        List<Product> productList = service.getAll();
-        assertFalse(productList.isEmpty());
+        CompletableFuture<List<Product>> productList = service.getAll();
+        assertFalse(productList.get().isEmpty());
         Product savedProduct = products.getFirst();
         assertNotNull(savedProduct);
         assertNotNull(UUID.fromString(savedProduct.getId()));
