@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class PromoCodeServiceImplTest {
+class PromoCodeServiceImplTest {
     @Mock
     PromoCodeRepository promoCodeRepository;
 
@@ -52,6 +52,16 @@ public class PromoCodeServiceImplTest {
         assertNotNull(savedPromoCode.getCodeId());
         assertEquals(105000, savedPromoCode.getMinimumPayment());
         assertEquals("Diskon besar", savedPromoCode.getDescription());
+    }
+
+    @Test
+    void saveExistingCodeNameTest(){
+        promoCode1.setCodeName("BELANJAHEMATT75");
+
+        when(promoCodeRepository.save(any(PromoCode.class))).thenThrow(new RuntimeException("duplicate values"));
+        assertThrows(IllegalArgumentException.class, () -> service.save(promoCode1));
+
+        verify(promoCodeRepository, times(1)).save(promoCode1);
     }
 
     @Test

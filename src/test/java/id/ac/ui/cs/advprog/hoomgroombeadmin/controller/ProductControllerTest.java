@@ -2,7 +2,6 @@ package id.ac.ui.cs.advprog.hoomgroombeadmin.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import id.ac.ui.cs.advprog.hoomgroombeadmin.controller.ProductRestController;
 
 import id.ac.ui.cs.advprog.hoomgroombeadmin.model.Product;
 import id.ac.ui.cs.advprog.hoomgroombeadmin.service.JwtService;
@@ -14,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.InjectMocks;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -33,7 +31,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ProductControllerTest {
+class ProductControllerTest {
 
     private MockMvc mvc;
 
@@ -65,7 +63,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void createProductTest() throws Exception {
+    void createProductTest() throws Exception {
         when(productService.save(any(Product.class))).thenReturn(product1);
         when(jwtService.isTokenValid(anyString())).thenReturn(true);
         when(jwtService.extractRole(anyString())).thenReturn("ADMIN");
@@ -93,7 +91,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void createProductNotAdminTest() throws Exception {
+    void createProductNotAdminTest() throws Exception {
         when(jwtService.isTokenValid(anyString())).thenReturn(true);
         when(jwtService.extractRole(anyString())).thenReturn("USER");
 
@@ -107,7 +105,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void createProductNotLoggedInTest() throws Exception {
+    void createProductNotLoggedInTest() throws Exception {
         when(jwtService.isTokenValid(anyString())).thenReturn(false);
 
         mvc.perform(post("/admin/product/create").contentType(MediaType.APPLICATION_JSON)
@@ -119,7 +117,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void updateProductPostTest() throws Exception {
+    void updateProductPostTest() throws Exception {
         when(productService.save(any(Product.class))).thenReturn(product1);
         when(jwtService.isTokenValid(anyString())).thenReturn(true);
         when(jwtService.extractRole(anyString())).thenReturn("ADMIN");
@@ -147,7 +145,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void updateProductPostNotAdminTest() throws Exception {
+    void updateProductPostNotAdminTest() throws Exception {
         when(jwtService.isTokenValid(anyString())).thenReturn(true);
         when(jwtService.extractRole(anyString())).thenReturn("USER");
 
@@ -162,7 +160,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void updateProductPostNotLoggedInTest() throws Exception {
+    void updateProductPostNotLoggedInTest() throws Exception {
         when(jwtService.isTokenValid(anyString())).thenReturn(false);
 
         mvc.perform(post("/admin/product/update/save")
@@ -175,7 +173,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void updateProductPageTest() throws Exception {
+    void updateProductPageTest() throws Exception {
         UUID productId = new UUID(32, 10);
         product1.setId(productId.toString());
         when(productService.getProductById(productId.toString())).thenReturn(product1);
@@ -204,7 +202,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void updateProductPageIdNotFoundTest() throws Exception {
+    void updateProductPageIdNotFoundTest() throws Exception {
         when(productService.getProductById(anyString())).thenReturn(null);
         when(jwtService.isTokenValid(anyString())).thenReturn(true);
         when(jwtService.extractRole(anyString())).thenReturn("ADMIN");
@@ -218,7 +216,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void updateProductPageNotAdminTest() throws Exception {
+    void updateProductPageNotAdminTest() throws Exception {
         when(jwtService.isTokenValid(anyString())).thenReturn(true);
         when(jwtService.extractRole(anyString())).thenReturn("USER");
 
@@ -231,7 +229,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void updateProductPageNotLoggedInTest() throws Exception {
+    void updateProductPageNotLoggedInTest() throws Exception {
         when(jwtService.isTokenValid(anyString())).thenReturn(false);
 
         mvc.perform(get("/admin/product/update/" + "ABC123")
@@ -263,7 +261,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void deleteProductNotAdminTest() throws Exception {
+    void deleteProductNotAdminTest() throws Exception {
         UUID productId = new UUID(32, 10);
         when(jwtService.isTokenValid(anyString())).thenReturn(true);
         when(jwtService.extractRole(anyString())).thenReturn("USER");
@@ -277,7 +275,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void deleteProductNotLoggedInTest() throws Exception {
+    void deleteProductNotLoggedInTest() throws Exception {
         UUID productId = new UUID(32, 10);
         when(jwtService.isTokenValid(anyString())).thenReturn(false);
 
@@ -312,7 +310,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void testIncrementSalesFails() throws Exception {
+    void testIncrementSalesFails() throws Exception {
         HashMap<String, Integer> productsSold = new HashMap<>();
         productsSold.put("prod1", 10);
         productsSold.put("prod2", 20);
@@ -334,7 +332,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void testIncrementSalesSuccess() throws Exception {
+    void testIncrementSalesSuccess() throws Exception {
         HashMap<String, Integer> productsSold = new HashMap<>();
         productsSold.put("prod1", 10);
         productsSold.put("prod2", 20);

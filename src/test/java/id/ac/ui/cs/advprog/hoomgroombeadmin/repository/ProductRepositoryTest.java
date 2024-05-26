@@ -15,13 +15,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 @Transactional
 @Commit
-public class ProductRepositoryTest {
+class ProductRepositoryTest {
 
     @Autowired
     private ProductRepository productRepository;
 
     @Test
-    public void testIncrementSalesSuccess() {
+    void testIncrementSalesSuccess() {
         Product product1 = new Product();
         List<String> tags1 = Arrays.asList("vintage", "white", "indoor");
         product1.setProductName("Furniture 1");
@@ -33,14 +33,11 @@ public class ProductRepositoryTest {
         Product savedProduct = productRepository.save(product1);
 
         int result = productRepository.incrementSales(savedProduct.getId(), 5);
-//        long updatedSales = productRepository.findById(savedProduct.getId()).get().getSales();
-
         assertEquals(1, result);
-//        assertEquals(5, updatedSales);
     }
 
     @Test
-    public void testIncrementSalesFails() {
+    void testIncrementSalesFails() {
         int result = productRepository.incrementSales("ABC123", 5);
         assertEquals(0, result);
     }

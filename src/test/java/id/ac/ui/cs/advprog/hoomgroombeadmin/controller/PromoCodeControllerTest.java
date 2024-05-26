@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
-public class PromoCodeControllerTest {
+class PromoCodeControllerTest {
     private MockMvc mvc;
 
     @InjectMocks
@@ -49,7 +49,7 @@ public class PromoCodeControllerTest {
     }
 
     @Test
-    public void createPromoCodeTest() throws Exception {
+    void createPromoCodeTest() throws Exception {
         when(service.save(any(PromoCode.class))).thenReturn(promoCode1);
         when(jwtService.isTokenValid(anyString())).thenReturn(true);
         when(jwtService.extractRole(anyString())).thenReturn("ADMIN");
@@ -75,7 +75,7 @@ public class PromoCodeControllerTest {
     }
 
     @Test
-    public void createPromoCodeNotAdminTest() throws Exception {
+    void createPromoCodeNotAdminTest() throws Exception {
         when(jwtService.isTokenValid(anyString())).thenReturn(true);
         when(jwtService.extractRole(anyString())).thenReturn("USER");
 
@@ -89,7 +89,7 @@ public class PromoCodeControllerTest {
     }
 
     @Test
-    public void createPromoCodeNotLoggedInTest() throws Exception {
+    void createPromoCodeNotLoggedInTest() throws Exception {
         when(jwtService.isTokenValid(anyString())).thenReturn(false);
 
         mvc.perform(post("/admin/promo-code/create").contentType(MediaType.APPLICATION_JSON)
@@ -101,7 +101,7 @@ public class PromoCodeControllerTest {
     }
 
     @Test
-    public void updatePromoCodePostTest() throws Exception {
+    void updatePromoCodePostTest() throws Exception {
         when(service.save(any(PromoCode.class))).thenReturn(promoCode1);
         when(jwtService.isTokenValid(anyString())).thenReturn(true);
         when(jwtService.extractRole(anyString())).thenReturn("ADMIN");
@@ -128,7 +128,7 @@ public class PromoCodeControllerTest {
     }
 
     @Test
-    public void updatePromoCodePostNotAdminTest() throws Exception {
+    void updatePromoCodePostNotAdminTest() throws Exception {
         when(jwtService.isTokenValid(anyString())).thenReturn(true);
         when(jwtService.extractRole(anyString())).thenReturn("USER");
 
@@ -142,7 +142,7 @@ public class PromoCodeControllerTest {
     }
 
     @Test
-    public void updatePromoCodePostNotLoggedInTest() throws Exception {
+    void updatePromoCodePostNotLoggedInTest() throws Exception {
         when(jwtService.isTokenValid(anyString())).thenReturn(false);
 
         mvc.perform(post("/admin/promo-code/update/save")
@@ -154,7 +154,7 @@ public class PromoCodeControllerTest {
     }
 
     @Test
-    public void updatePromoCodePageTest() throws Exception {
+    void updatePromoCodePageTest() throws Exception {
         UUID promoCodeId = new UUID(32, 10);
         promoCode1.setCodeId(promoCodeId.toString());
         promoCode1.setCodeName("Belanja55");
@@ -182,7 +182,7 @@ public class PromoCodeControllerTest {
     }
 
     @Test
-    public void updatePromoCodePageIdNotFoundTest() throws Exception {
+    void updatePromoCodePageIdNotFoundTest() throws Exception {
         when(service.getPromoCodeById(anyString())).thenReturn(null);
         when(jwtService.isTokenValid(anyString())).thenReturn(true);
         when(jwtService.extractRole(anyString())).thenReturn("ADMIN");
@@ -197,7 +197,7 @@ public class PromoCodeControllerTest {
     }
 
     @Test
-    public void updatePromoCodePageNotAdminTest() throws Exception {
+    void updatePromoCodePageNotAdminTest() throws Exception {
         when(jwtService.isTokenValid(anyString())).thenReturn(true);
         when(jwtService.extractRole(anyString())).thenReturn("USER");
 
@@ -210,7 +210,7 @@ public class PromoCodeControllerTest {
     }
 
     @Test
-    public void updatePromoCodePageNotLoggedInTest() throws Exception {
+    void updatePromoCodePageNotLoggedInTest() throws Exception {
         when(jwtService.isTokenValid(anyString())).thenReturn(false);
 
         mvc.perform(get("/admin/promo-code/update/" + "ABC123")
@@ -221,7 +221,7 @@ public class PromoCodeControllerTest {
     }
 
     @Test
-    public void deletePromoCodeTest() throws Exception {
+    void deletePromoCodeTest() throws Exception {
         UUID promoCodeId = new UUID(32, 10);
         String expectedResult = "Deleted promo code with ID " + promoCodeId;
         when(service.delete(promoCodeId.toString())).thenReturn(promoCodeId.toString());
@@ -240,7 +240,7 @@ public class PromoCodeControllerTest {
     }
 
     @Test
-    public void deletePromoCodeNotAdminTest() throws Exception {
+    void deletePromoCodeNotAdminTest() throws Exception {
         UUID promoCodeId = new UUID(32, 10);
         when(jwtService.isTokenValid(anyString())).thenReturn(true);
         when(jwtService.extractRole(anyString())).thenReturn("USER");
@@ -254,7 +254,7 @@ public class PromoCodeControllerTest {
     }
 
     @Test
-    public void deletePromoCodeNotLoggedInTest() throws Exception {
+    void deletePromoCodeNotLoggedInTest() throws Exception {
         UUID promoCodeId = new UUID(32, 10);
         when(jwtService.isTokenValid(anyString())).thenReturn(false);
 
@@ -266,7 +266,7 @@ public class PromoCodeControllerTest {
     }
 
     @Test
-    public void listPromoCodeTest() throws Exception {
+    void listPromoCodeTest() throws Exception {
         promoCode1.setCodeName("belanjaaa99");
         when(service.getAll()).thenReturn(Arrays.asList(promoCode1));
         when(jwtService.isTokenValid(anyString())).thenReturn(true);
@@ -293,7 +293,7 @@ public class PromoCodeControllerTest {
     }
 
     @Test
-    public void listPromoCodeNotAdminTest() throws Exception {
+    void listPromoCodeNotAdminTest() throws Exception {
         when(jwtService.isTokenValid(anyString())).thenReturn(true);
         when(jwtService.extractRole(anyString())).thenReturn("USER");
 
@@ -306,7 +306,7 @@ public class PromoCodeControllerTest {
     }
 
     @Test
-    public void listPromoCodeNotLoggedInTest() throws Exception {
+    void listPromoCodeNotLoggedInTest() throws Exception {
         when(jwtService.isTokenValid(anyString())).thenReturn(false);
 
         mvc.perform(get("/admin/promo-code/manage")
