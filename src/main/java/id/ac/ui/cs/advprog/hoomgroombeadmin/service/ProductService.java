@@ -11,9 +11,9 @@ public interface ProductService {
     public CompletableFuture<String> delete(String productId);
     public CompletableFuture<List<Product>> getAll();
     public Product getProductById(String productId);
-    public List<Product> getProductsByPrice(int amount, boolean fromLowest);
-    public List<Product> getProductsBySales(int amount, boolean fromLowest);
-    public List<Product> getProductsBySearched(int amount, boolean fromLowest, String keyword);
-    public List<Product> getProductsByTag(int amount, boolean fromLowest);
+    public CompletableFuture<List<Product>> getProductsByPrice(int amount, boolean fromLowest);
+    public CompletableFuture<List<Product>> getProductsBySales(int amount, boolean fromLowest);
+    public CompletableFuture<List<Product>> getProductsBySearched(int amount, boolean fromLowest, String keyword);
+    public CompletableFuture<List<Product>> getProductsByTag(int amount, boolean fromLowest);
     public CompletableFuture<String> incrementSales(Map<String, Integer> productsSold);
 }

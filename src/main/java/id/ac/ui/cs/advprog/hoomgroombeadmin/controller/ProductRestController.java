@@ -89,14 +89,14 @@ public class ProductRestController {
             @RequestParam String filterType,
             @RequestParam int amount,
             @RequestParam boolean fromLowest,
-            @RequestParam(required = false) String keyword) {
+            @RequestParam(required = false) String keyword) throws ExecutionException, InterruptedException {
 
         List<Product> result = new ArrayList<>();
         switch (filterType) {
-            case "price": result = service.getProductsByPrice(amount, fromLowest); break;
-            case "sales": result = service.getProductsBySales(amount, fromLowest); break;
-            case "search": result = service.getProductsBySearched(amount, fromLowest, keyword); break;
-            case "tag": result = service.getProductsByTag(amount, fromLowest); break;
+            case "price": result = service.getProductsByPrice(amount, fromLowest).get(); break;
+            case "sales": result = service.getProductsBySales(amount, fromLowest).get(); break;
+            case "search": result = service.getProductsBySearched(amount, fromLowest, keyword).get(); break;
+            case "tag": result = service.getProductsByTag(amount, fromLowest).get(); break;
             default: return new ResponseEntity<>(result, HttpStatus.OK);
         }
 
