@@ -77,9 +77,9 @@ public class ProductServiceTest {
     }
 
     @Test
-    void testDeleteIfIdNotFound(){
+    void testDeleteIfIdNotFound() throws ExecutionException, InterruptedException {
         String productId = (new UUID(32, 10)).toString();
-        assertEquals(productId, service.delete(productId));
+        assertEquals(productId, service.delete(productId).get());
     }
 
     @Test
@@ -133,7 +133,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void testFilterByLowestPriceIfAmountBigger(){
+    void testFilterByLowestPriceIfAmountBigger() throws ExecutionException, InterruptedException {
         Product product2 = new Product();
         product2.setRealPrice(1000000);
 
@@ -143,7 +143,7 @@ public class ProductServiceTest {
         List<Product> products = Arrays.asList(product1, product2, product3);
         when(productRepository.findAll()).thenReturn(products);
 
-        List<Product> result = service.getProductsByPrice(10, true);
+        List<Product> result = service.getProductsByPrice(10, true).get();
 
         assertNotNull(result);
         assertEquals(3, result.size());
@@ -152,7 +152,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void testFilterByHighestPriceIfAmountBigger(){
+    void testFilterByHighestPriceIfAmountBigger() throws ExecutionException, InterruptedException {
         Product product2 = new Product();
         product2.setRealPrice(1000000);
 
@@ -162,7 +162,7 @@ public class ProductServiceTest {
         List<Product> products = Arrays.asList(product1, product2, product3);
         when(productRepository.findAll()).thenReturn(products);
 
-        List<Product> result = service.getProductsByPrice(10, false);
+        List<Product> result = service.getProductsByPrice(10, false).get();
 
         assertNotNull(result);
         assertEquals(3, result.size());
@@ -171,7 +171,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void testFilterLowestPriceIfAmountSmaller() {
+    void testFilterLowestPriceIfAmountSmaller() throws ExecutionException, InterruptedException {
         Product product2 = new Product();
         product2.setRealPrice(1000000);
 
@@ -206,7 +206,7 @@ public class ProductServiceTest {
                 product4, product5, product6, product7, product8, product9, product10, product11);
         when(productRepository.findAll()).thenReturn(products);
 
-        List<Product> result = service.getProductsByPrice(8, true);
+        List<Product> result = service.getProductsByPrice(8, true).get();
         assertEquals(8, result.size());
         assertEquals(900000, result.getFirst().getRealPrice());
         assertEquals(1000000, result.get(1).getRealPrice());
@@ -214,7 +214,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void testFilterHighestPriceIfAmountSmaller(){
+    void testFilterHighestPriceIfAmountSmaller() throws ExecutionException, InterruptedException {
         Product product2 = new Product();
         product2.setRealPrice(1000000);
 
@@ -249,7 +249,7 @@ public class ProductServiceTest {
                 product4, product5, product6, product7, product8, product9, product10, product11);
         when(productRepository.findAll()).thenReturn(products);
 
-        List<Product> result = service.getProductsByPrice(8, false);
+        List<Product> result = service.getProductsByPrice(8, false).get();
         assertEquals(8, result.size());
         assertEquals(5500000, result.getFirst().getRealPrice());
         assertEquals(5000000, result.get(1).getRealPrice());
@@ -257,7 +257,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void testFilterByLowestSalesIfAmountBigger(){
+    void testFilterByLowestSalesIfAmountBigger() throws ExecutionException, InterruptedException {
         product1.setSales(30);
 
         Product product2 = new Product();
@@ -269,7 +269,7 @@ public class ProductServiceTest {
         List<Product> products = Arrays.asList(product1, product2, product3);
         when(productRepository.findAll()).thenReturn(products);
 
-        List<Product> result = service.getProductsBySales(10, true);
+        List<Product> result = service.getProductsBySales(10, true).get();
 
         assertNotNull(result);
         assertEquals(3, result.size());
@@ -278,7 +278,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void testFilterByHighestSalesIfAmountBigger(){
+    void testFilterByHighestSalesIfAmountBigger() throws ExecutionException, InterruptedException {
         product1.setSales(30);
 
         Product product2 = new Product();
@@ -290,7 +290,7 @@ public class ProductServiceTest {
         List<Product> products = Arrays.asList(product1, product2, product3);
         when(productRepository.findAll()).thenReturn(products);
 
-        List<Product> result = service.getProductsBySales(10, false);
+        List<Product> result = service.getProductsBySales(10, false).get();
 
         assertNotNull(result);
         assertEquals(3, result.size());
@@ -299,7 +299,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void testFilterByHighestSalesIfAmountSmaller(){
+    void testFilterByHighestSalesIfAmountSmaller() throws ExecutionException, InterruptedException {
         product1.setSales(30);
 
         Product product2 = new Product();
@@ -317,7 +317,7 @@ public class ProductServiceTest {
         List<Product> products = Arrays.asList(product1, product2, product3, product4, product5);
         when(productRepository.findAll()).thenReturn(products);
 
-        List<Product> result = service.getProductsBySales(3, false);
+        List<Product> result = service.getProductsBySales(3, false).get();
 
         assertNotNull(result);
         assertEquals(3, result.size());
@@ -326,7 +326,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void testFilterByLowestSalesIfAmountSmaller(){
+    void testFilterByLowestSalesIfAmountSmaller() throws ExecutionException, InterruptedException {
         product1.setSales(30);
 
         Product product2 = new Product();
@@ -344,7 +344,7 @@ public class ProductServiceTest {
         List<Product> products = Arrays.asList(product1, product2, product3, product4, product5);
         when(productRepository.findAll()).thenReturn(products);
 
-        List<Product> result = service.getProductsBySales(3, true);
+        List<Product> result = service.getProductsBySales(3, true).get();
 
         assertNotNull(result);
         assertEquals(3, result.size());
@@ -353,25 +353,25 @@ public class ProductServiceTest {
     }
 
    @Test
-   void testFilterIfEmpty(){
+   void testFilterIfEmpty() throws ExecutionException, InterruptedException {
        when(productRepository.findAll()).thenReturn(new ArrayList<Product>());
-       List<Product> result = service.getProductsByPrice(10, false);
+       List<Product> result = service.getProductsByPrice(10, false).get();
 
        assertNotNull(result);
        assertEquals(0, result.size());
    }
 
    @Test
-   void testSearchIfEmpty(){
+   void testSearchIfEmpty() throws ExecutionException, InterruptedException {
        when(productRepository.findByProductNameContainingIgnoreCase("Test")).thenReturn(new ArrayList<Product>());
-       List<Product> result = service.getProductsBySearched(10, false, "Test");
+       List<Product> result = service.getProductsBySearched(10, false, "Test").get();
 
        assertNotNull(result);
        assertEquals(0, result.size());
    }
 
    @Test
-   void testSearchedKeywordNotEmptyAscending() {
+   void testSearchedKeywordNotEmptyAscending() throws ExecutionException, InterruptedException {
        Product searchedProduct1 = new Product();
        searchedProduct1.setProductName("Furry 1");
 
@@ -384,7 +384,7 @@ public class ProductServiceTest {
        List<Product> products = Arrays.asList(searchedProduct2, searchedProduct1, searchedProduct3);
        when(productRepository.findByProductNameContainingIgnoreCase("Furry")).thenReturn(products);
 
-       List<Product> result = service.getProductsBySearched(3, true, "Furry");
+       List<Product> result = service.getProductsBySearched(3, true, "Furry").get();
 
        assertEquals(3, result.size());
        assertEquals("Furry 1", result.getFirst().getProductName());
@@ -392,7 +392,7 @@ public class ProductServiceTest {
        assertEquals("Furry 3", result.getLast().getProductName());
    }
 
-    void testSearchedKeywordNotEmptyDescending() {
+    void testSearchedKeywordNotEmptyDescending() throws ExecutionException, InterruptedException {
         Product searchedProduct1 = new Product();
         searchedProduct1.setProductName("Furry 1");
 
@@ -405,7 +405,7 @@ public class ProductServiceTest {
         List<Product> products = Arrays.asList(searchedProduct2, searchedProduct1, searchedProduct3);
         when(productRepository.findByProductNameContainingIgnoreCase("Furry")).thenReturn(products);
 
-        List<Product> result = service.getProductsBySearched(3, false, "Furry");
+        List<Product> result = service.getProductsBySearched(3, false, "Furry").get();
 
         assertEquals(3, result.size());
         assertEquals("Furry 3", result.getFirst().getProductName());
@@ -414,7 +414,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void testFilterByTagAscending() {
+    void testFilterByTagAscending() throws ExecutionException, InterruptedException {
         Product taggedProduct1 = new Product();
         List<String> tag1 = Arrays.asList("vintage", "white", "indoor");
         taggedProduct1.setProductName("Product1");
@@ -428,7 +428,7 @@ public class ProductServiceTest {
         List<Product> products = Arrays.asList(taggedProduct1, taggedProduct2);
         when(productRepository.findAll()).thenReturn(products);
 
-        List<Product> result = service.getProductsByTag(2, true);
+        List<Product> result = service.getProductsByTag(2, true).get();
         assertEquals(2, result.size());
         assertEquals("Product1", result.getFirst().getProductName());
         assertEquals("Product2", result.get(1).getProductName());
@@ -436,7 +436,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void testFilterByTagDescending() {
+    void testFilterByTagDescending() throws ExecutionException, InterruptedException {
         Product taggedProduct1 = new Product();
         List<String> tag1 = Arrays.asList("vintage", "white", "indoor");
         taggedProduct1.setProductName("Product1");
@@ -450,7 +450,7 @@ public class ProductServiceTest {
         List<Product> products = Arrays.asList(taggedProduct1, taggedProduct2);
         when(productRepository.findAll()).thenReturn(products);
 
-        List<Product> result = service.getProductsByTag(2, false);
+        List<Product> result = service.getProductsByTag(2, false).get();
         assertEquals(2, result.size());
         assertEquals("Product2", result.getFirst().getProductName());
         assertEquals("Product1", result.get(1).getProductName());
