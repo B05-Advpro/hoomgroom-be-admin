@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequiredArgsConstructor
@@ -48,7 +49,7 @@ public class ProductRestController {
     @GetMapping("/update/{productId}")
     public ResponseEntity<Product> updateProductPage(@RequestHeader (value = "Authorization") String token, @PathVariable String productId){
         token = token.substring(7);
-        if (!jwtService.isTokenValid(token) || !jwtService.extractRole(token).equals(ROLE)){
+        if (!jwtService.isTokenValid(token)){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         Product result = service.getProductById(productId);
@@ -59,25 +60,25 @@ public class ProductRestController {
     }
 
     @DeleteMapping("/delete/{productId}")
-    public ResponseEntity<String> deleteProduct(@RequestHeader (value = "Authorization") String token, @PathVariable String productId){
+    public ResponseEntity<String> deleteProduct(@RequestHeader (value = "Authorization") String token, @PathVariable String productId) throws ExecutionException, InterruptedException {
         token = token.substring(7);
         if (!jwtService.isTokenValid(token) || !jwtService.extractRole(token).equals(ROLE)){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        String result = "Deleted product with ID " + service.delete(productId);
+        String result = "Deleted product with ID " + service.delete(productId).get();
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<Product>> listProduct(){
-        List<Product> result = service.getAll();
-        return new ResponseEntity<>(result, HttpStatus.OK);
+    public ResponseEntity<List<Product>> listProduct() throws ExecutionException, InterruptedException{
+        CompletableFuture<List<Product>> result = service.getAll();
+        return new ResponseEntity<>(result.get(), HttpStatus.OK);
     }
 
     @GetMapping("/filter?sortby=")
-    public ResponseEntity<List<Product>> listProductByTag(){
-        List<Product> result = service.getAll();
-        return new ResponseEntity<>(result, HttpStatus.OK);
+    public ResponseEntity<List<Product>> listProductByTag() throws ExecutionException, InterruptedException{
+        CompletableFuture<List<Product>> result = service.getAll();
+        return new ResponseEntity<>(result.get(), HttpStatus.OK);
     }
 
     @GetMapping("/filter")
@@ -85,14 +86,14 @@ public class ProductRestController {
             @RequestParam String filterType,
             @RequestParam int amount,
             @RequestParam boolean fromLowest,
-            @RequestParam(required = false) String keyword) {
+            @RequestParam(required = false) String keyword) throws ExecutionException, InterruptedException {
 
         List<Product> result = new ArrayList<>();
         switch (filterType) {
-            case "price": result = service.getProductsByPrice(amount, fromLowest); break;
-            case "sales": result = service.getProductsBySales(amount, fromLowest); break;
-            case "search": result = service.getProductsBySearched(amount, fromLowest, keyword); break;
-            case "tag": result = service.getProductsByTag(amount, fromLowest); break;
+            case "price": result = service.getProductsByPrice(amount, fromLowest).get(); break;
+            case "sales": result = service.getProductsBySales(amount, fromLowest).get(); break;
+            case "search": result = service.getProductsBySearched(amount, fromLowest, keyword).get(); break;
+            case "tag": result = service.getProductsByTag(amount, fromLowest).get(); break;
             default: return new ResponseEntity<>(result, HttpStatus.OK);
         }
 

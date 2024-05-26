@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -239,10 +240,11 @@ class ProductControllerTest {
     }
 
     @Test
-    void deleteProductTest() throws Exception {
+    public void deleteProductTest() throws Exception, ExecutionException, InterruptedException {
         UUID productId = new UUID(32, 10);
-        String expectedResult = "Deleted product with ID " + productId;
-        when(productService.delete(productId.toString())).thenReturn(productId.toString());
+        CompletableFuture<String> completableFuture = CompletableFuture.completedFuture(productId.toString());
+        String expectedResult = "Deleted product with ID " + productId.toString();
+        when(productService.delete(productId.toString())).thenReturn(CompletableFuture.completedFuture(productId.toString()));
         when(jwtService.isTokenValid(anyString())).thenReturn(true);
         when(jwtService.extractRole(anyString())).thenReturn("ADMIN");
 
@@ -285,8 +287,9 @@ class ProductControllerTest {
     }
 
     @Test
-    void listProductTest() throws Exception {
-        when(productService.getAll()).thenReturn(Arrays.asList(product1));
+    public void listProductTest() throws Exception {
+        List<Product> prod = Arrays.asList(product1);
+        when(productService.getAll()).thenReturn(CompletableFuture.completedFuture(prod));
         mvc.perform(get("/admin/product/list"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

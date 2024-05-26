@@ -38,52 +38,17 @@ public class ProductServiceImpl implements ProductService{
             return null;
         }
     }
-
     @Override
-    public List<Product> getAll() {
-        return productRepository.findAll();
+    public CompletableFuture<List<Product>> getAll() {
+        return CompletableFuture.supplyAsync(() -> productRepository.findAll());
     }
 
     @Override
-    public String delete(String productId) {
-        productRepository.deleteById(productId);
-        return productId;
-    }
-
-    /* Will return empty list if there are no products found
-    amount: the number of products that will be returned in the list
-    fromLowest: true when you want to sort price from lowest
-    */
-    @Override
-    public List<Product> getProductsByPrice(int amount, boolean fromLowest){
-        filterContext.setStrategy(new ProductFilterByPrice());
-        List<Product> sortedbyPrice = filterContext.executeStrategy(productRepository.findAll());
-
-        if (amount > sortedbyPrice.size()){
-            if (fromLowest) return sortedbyPrice;
-            else return sortedbyPrice.reversed();
-        }
-        if (fromLowest) {
-            return sortedbyPrice.subList(0, amount);
-        } else {
-            return sortedbyPrice.reversed().subList(0, amount);
-        }
-    }
-
-    @Override
-    public List<Product> getProductsBySearched(int amount, boolean fromLowest, String keyword){
-        filterContext.setStrategy(new ProductFilterBySearch());
-        List<Product> searchedProducts = filterContext.executeStrategy(productRepository.findByProductNameContainingIgnoreCase(keyword));
-
-        if (amount > searchedProducts.size()){
-            if (fromLowest) return searchedProducts;
-            else return searchedProducts.reversed();
-        }
-        if (fromLowest) {
-            return searchedProducts.subList(0, amount);
-        } else {
-            return searchedProducts.reversed().subList(0, amount);
-        }
+    public CompletableFuture<String> delete(String productId) {
+        return CompletableFuture.supplyAsync(() -> {
+            productRepository.deleteById(productId);
+            return productId;
+        });
     }
 
     /* Will return empty list if there are no products found
@@ -91,35 +56,79 @@ public class ProductServiceImpl implements ProductService{
     fromLowest: true when you want to sort price from lowest
     */
     @Override
-    public List<Product> getProductsBySales(int amount, boolean fromLowest){
-        filterContext.setStrategy(new ProductFilterBySales());
-        List<Product> sortedBySales = filterContext.executeStrategy(productRepository.findAll());
+    public CompletableFuture<List<Product>> getProductsByPrice(int amount, boolean fromLowest){
+        return CompletableFuture.supplyAsync(() -> {
+            filterContext.setStrategy(new ProductFilterByPrice());
+            List<Product> sortedbyPrice = filterContext.executeStrategy(productRepository.findAll());
 
-        if (amount > sortedBySales.size()){
-            if (fromLowest) return sortedBySales;
-            else return sortedBySales.reversed();
-        }
-        if (fromLowest) {
-            return sortedBySales.subList(0, amount);
-        } else {
-            return sortedBySales.reversed().subList(0, amount);
-        }
+            if (amount > sortedbyPrice.size()) {
+                if (fromLowest) return sortedbyPrice;
+                else return sortedbyPrice.reversed();
+            }
+            if (fromLowest) {
+                return sortedbyPrice.subList(0, amount);
+            } else {
+                return sortedbyPrice.reversed().subList(0, amount);
+            }
+        });
     }
 
     @Override
-    public List<Product> getProductsByTag(int amount, boolean fromLowest){
-        filterContext.setStrategy(new ProductFilterByTag());
-        List<Product> taggedProducts = filterContext.executeStrategy(productRepository.findAll());
+    public CompletableFuture<List<Product>> getProductsBySearched(int amount, boolean fromLowest, String keyword){
+        return CompletableFuture.supplyAsync(() -> {
+            filterContext.setStrategy(new ProductFilterBySearch());
+            List<Product> searchedProducts = filterContext.executeStrategy(productRepository.findByProductNameContainingIgnoreCase(keyword));
 
-        if (amount > taggedProducts.size()){
-            if (fromLowest) return taggedProducts;
-            else return taggedProducts.reversed();
-        }
-        if (fromLowest) {
-            return taggedProducts.subList(0, amount);
-        } else {
-            return taggedProducts.reversed().subList(0, amount);
-        }
+            if (amount > searchedProducts.size()) {
+                if (fromLowest) return searchedProducts;
+                else return searchedProducts.reversed();
+            }
+            if (fromLowest) {
+                return searchedProducts.subList(0, amount);
+            } else {
+                return searchedProducts.reversed().subList(0, amount);
+            }
+        });
+    }
+
+    /* Will return empty list if there are no products found
+    amount: the number of products that will be returned in the list
+    fromLowest: true when you want to sort price from lowest
+    */
+    @Override
+    public CompletableFuture<List<Product>> getProductsBySales(int amount, boolean fromLowest){
+        return CompletableFuture.supplyAsync(() -> {
+            filterContext.setStrategy(new ProductFilterBySales());
+            List<Product> sortedBySales = filterContext.executeStrategy(productRepository.findAll());
+
+            if (amount > sortedBySales.size()) {
+                if (fromLowest) return sortedBySales;
+                else return sortedBySales.reversed();
+            }
+            if (fromLowest) {
+                return sortedBySales.subList(0, amount);
+            } else {
+                return sortedBySales.reversed().subList(0, amount);
+            }
+        });
+    }
+
+    @Override
+    public CompletableFuture<List<Product>> getProductsByTag(int amount, boolean fromLowest){
+        return CompletableFuture.supplyAsync(() -> {
+            filterContext.setStrategy(new ProductFilterByTag());
+            List<Product> taggedProducts = filterContext.executeStrategy(productRepository.findAll());
+
+            if (amount > taggedProducts.size()) {
+                if (fromLowest) return taggedProducts;
+                else return taggedProducts.reversed();
+            }
+            if (fromLowest) {
+                return taggedProducts.subList(0, amount);
+            } else {
+                return taggedProducts.reversed().subList(0, amount);
+            }
+        });
     }
 
     @Async
