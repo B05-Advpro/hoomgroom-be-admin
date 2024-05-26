@@ -2,19 +2,18 @@ package id.ac.ui.cs.advprog.hoomgroombeadmin.service;
 
 import id.ac.ui.cs.advprog.hoomgroombeadmin.model.PromoCode;
 import id.ac.ui.cs.advprog.hoomgroombeadmin.repository.PromoCodeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.Optional;
 
 @Service
-public class
-PromoCodeServiceImpl implements PromoCodeService{
+@RequiredArgsConstructor
+public class PromoCodeServiceImpl implements PromoCodeService{
 
-    @Autowired
-    PromoCodeRepository promoCodeRepository;
+    private final PromoCodeRepository promoCodeRepository;
 
     @Override
     public PromoCode save(PromoCode promoCode) {
@@ -24,7 +23,11 @@ PromoCodeServiceImpl implements PromoCodeService{
     @Override
     public PromoCode getPromoCodeById(String promoCodeId) {
         try {
-            return promoCodeRepository.findById(promoCodeId).get();
+            Optional<PromoCode> result = promoCodeRepository.findById(promoCodeId);
+            if (result.isEmpty()){
+                throw new NoSuchElementException("The Id doesn't exist");
+            }
+            return result.get();
         } catch (NoSuchElementException e){
             return null;
         }

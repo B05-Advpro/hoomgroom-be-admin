@@ -3,20 +3,21 @@ package id.ac.ui.cs.advprog.hoomgroombeadmin.service;
 import id.ac.ui.cs.advprog.hoomgroombeadmin.model.Product;
 import id.ac.ui.cs.advprog.hoomgroombeadmin.repository.ProductRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Service
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService{
 
-    @Autowired
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
     private final ProductFilterContext filterContext = new ProductFilterContext(null);
 
@@ -28,7 +29,11 @@ public class ProductServiceImpl implements ProductService{
     @Override
     public Product getProductById(String productId) {
         try {
-            return productRepository.findById(productId).get();
+            Optional<Product> result = productRepository.findById(productId);
+            if (result.isEmpty()){
+                throw new NoSuchElementException("The Id doesn't exist");
+            }
+            return result.get();
         } catch (NoSuchElementException e){
             return null;
         }

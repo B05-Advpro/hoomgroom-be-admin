@@ -1,11 +1,9 @@
 package id.ac.ui.cs.advprog.hoomgroombeadmin.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import id.ac.ui.cs.advprog.hoomgroombeadmin.model.Product;
-import id.ac.ui.cs.advprog.hoomgroombeadmin.service.ProductFilterContext;
 import id.ac.ui.cs.advprog.hoomgroombeadmin.service.ProductService;
 import id.ac.ui.cs.advprog.hoomgroombeadmin.service.JwtService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
@@ -17,22 +15,20 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/admin/product")
 public class ProductRestController {
 
-    @Autowired
-    private ProductService service;
-
-    @Autowired
-    private JwtService jwtService;
+    private final ProductService service;
+    private final JwtService jwtService;
 
     private static final String ROLE = "ADMIN";
 
     @PostMapping("/create")
-    public ResponseEntity<Product> createProductPost(@RequestHeader (value = "Authorization") String token, @RequestBody Product product) throws JsonProcessingException {
+    public ResponseEntity<Product> createProductPost(@RequestHeader (value = "Authorization") String token, @RequestBody Product product){
         token = token.substring(7);
         if (!jwtService.isTokenValid(token) || !jwtService.extractRole(token).equals(ROLE)){
-            return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         Product result = service.save(product);
         return new ResponseEntity<>(result, HttpStatus.CREATED);
@@ -42,7 +38,7 @@ public class ProductRestController {
     public ResponseEntity<Product> updateProductPost(@RequestHeader (value = "Authorization") String token, @RequestBody Product product) {
         token = token.substring(7);
         if (!jwtService.isTokenValid(token) || !jwtService.extractRole(token).equals(ROLE)){
-            return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         Product result = service.save(product);
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -52,11 +48,11 @@ public class ProductRestController {
     public ResponseEntity<Product> updateProductPage(@RequestHeader (value = "Authorization") String token, @PathVariable String productId){
         token = token.substring(7);
         if (!jwtService.isTokenValid(token) || !jwtService.extractRole(token).equals(ROLE)){
-            return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         Product result = service.getProductById(productId);
         if (result == null){
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -65,7 +61,7 @@ public class ProductRestController {
     public ResponseEntity<String> deleteProduct(@RequestHeader (value = "Authorization") String token, @PathVariable String productId){
         token = token.substring(7);
         if (!jwtService.isTokenValid(token) || !jwtService.extractRole(token).equals(ROLE)){
-            return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         String result = "Deleted product with ID " + service.delete(productId);
         return new ResponseEntity<>(result, HttpStatus.OK);
