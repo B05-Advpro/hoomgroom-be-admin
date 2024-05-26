@@ -4,7 +4,6 @@ import id.ac.ui.cs.advprog.hoomgroombeadmin.model.PromoCode;
 import id.ac.ui.cs.advprog.hoomgroombeadmin.service.PromoCodeService;
 import id.ac.ui.cs.advprog.hoomgroombeadmin.service.JwtService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
