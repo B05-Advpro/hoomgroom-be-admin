@@ -16,6 +16,7 @@ import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin
 @RequestMapping("/admin/product")
 public class ProductRestController {
 
