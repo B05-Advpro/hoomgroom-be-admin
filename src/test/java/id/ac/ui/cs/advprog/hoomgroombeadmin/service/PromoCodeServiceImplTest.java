@@ -55,6 +55,16 @@ class PromoCodeServiceImplTest {
     }
 
     @Test
+    void saveExistingCodeNameTest(){
+        promoCode1.setCodeName("BELANJAHEMATT75");
+
+        when(promoCodeRepository.save(any(PromoCode.class))).thenThrow(new RuntimeException("duplicate values"));
+        assertThrows(IllegalArgumentException.class, () -> service.save(promoCode1));
+
+        verify(promoCodeRepository, times(1)).save(promoCode1);
+    }
+
+    @Test
     void testDelete(){
         String promoCodeId = (new UUID(32, 10)).toString();
 
