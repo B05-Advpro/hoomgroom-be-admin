@@ -33,10 +33,9 @@ public class ProductServiceImpl implements ProductService{
             return null;
         }
     }
-
     @Override
-    public List<Product> getAll() {
-        return productRepository.findAll();
+    public CompletableFuture<List<Product>> getAll() {
+        return CompletableFuture.supplyAsync(() -> productRepository.findAll());
     }
 
     @Override

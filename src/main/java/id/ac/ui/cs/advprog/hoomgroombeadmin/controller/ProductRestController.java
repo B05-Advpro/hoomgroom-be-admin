@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/admin/product")
@@ -72,15 +73,15 @@ public class ProductRestController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<Product>> listProduct(){
-        List<Product> result = service.getAll();
-        return new ResponseEntity<>(result, HttpStatus.OK);
+    public ResponseEntity<List<Product>> listProduct() throws ExecutionException, InterruptedException{
+        CompletableFuture<List<Product>> result = service.getAll();
+        return new ResponseEntity<>(result.get(), HttpStatus.OK);
     }
 
     @GetMapping("/filter?sortby=")
-    public ResponseEntity<List<Product>> listProductByTag(){
-        List<Product> result = service.getAll();
-        return new ResponseEntity<>(result, HttpStatus.OK);
+    public ResponseEntity<List<Product>> listProductByTag() throws ExecutionException, InterruptedException{
+        CompletableFuture<List<Product>> result = service.getAll();
+        return new ResponseEntity<>(result.get(), HttpStatus.OK);
     }
 
     @GetMapping("/filter")

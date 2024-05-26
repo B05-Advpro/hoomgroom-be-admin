@@ -288,7 +288,8 @@ public class ProductControllerTest {
 
     @Test
     public void listProductTest() throws Exception {
-        when(productService.getAll()).thenReturn(Arrays.asList(product1));
+        List<Product> prod = Arrays.asList(product1);
+        when(productService.getAll()).thenReturn(CompletableFuture.completedFuture(prod));
         mvc.perform(get("/admin/product/list"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
