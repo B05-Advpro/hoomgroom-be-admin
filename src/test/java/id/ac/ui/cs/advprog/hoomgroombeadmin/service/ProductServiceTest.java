@@ -12,12 +12,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.ArgumentMatchers.any;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ProductServiceTest {
+class ProductServiceTest {
     @Mock
     ProductRepository productRepository;
     @InjectMocks
@@ -38,18 +40,18 @@ public class ProductServiceTest {
     }
 
     @Test
-    void testCreateAndFindAll(){
+    void testCreateAndFindAll() throws ExecutionException, InterruptedException{
         when(productRepository.save(any(Product.class))).thenReturn(product1);
         product1.setId("6f42392e-40a2-475a-9c00-c667307c20d8");
-        service.create(product1);
+        service.save(product1);
 
         verify(productRepository,times(1)).save(product1);
 
         List<Product> products = Arrays.asList(product1);
         when(productRepository.findAll()).thenReturn(products);
 
-        List<Product> productList = service.getAll();
-        assertFalse(productList.isEmpty());
+        CompletableFuture<List<Product>> productList = service.getAll();
+        assertFalse(productList.get().isEmpty());
         Product savedProduct = products.getFirst();
         assertNotNull(savedProduct);
         assertNotNull(UUID.fromString(savedProduct.getId()));
@@ -66,34 +68,27 @@ public class ProductServiceTest {
     }
 
     @Test
-    void testDelete(){
+    void testDelete() throws ExecutionException, InterruptedException{
         String productId = (new UUID(32, 10)).toString();
-        when(productRepository.existsById(productId)).thenReturn(true);
 
-        String result = service.delete(productId);
-        verify(productRepository,times(1)).existsById(productId);
+        CompletableFuture<String> result = service.delete(productId);
         verify(productRepository, times(1)).deleteById(productId);
-        assertEquals(productId, result);
+        assertEquals(productId, result.get());
     }
 
     @Test
-    void testDeleteIfIdNotFound(){
+    void testDeleteIfIdNotFound() throws ExecutionException, InterruptedException {
         String productId = (new UUID(32, 10)).toString();
-        when(productRepository.existsById(productId)).thenReturn(false);
-
-        assertNull(service.delete(productId));
-        verify(productRepository,times(1)).existsById(productId);
+        assertEquals(productId, service.delete(productId).get());
     }
 
     @Test
     void testGetProductByIdFound(){
         product1.setId("eb558e9f-1c39-460e-8860-71af6af63bd6");
-        when(productRepository.existsById("eb558e9f-1c39-460e-8860-71af6af63bd6")).thenReturn(true);
         when(productRepository.findById("eb558e9f-1c39-460e-8860-71af6af63bd6")).thenReturn(Optional.ofNullable(product1));
 
         Product savedProduct = service.getProductById("eb558e9f-1c39-460e-8860-71af6af63bd6");
 
-        verify(productRepository,times(1)).existsById("eb558e9f-1c39-460e-8860-71af6af63bd6");
         verify(productRepository,times(1)).findById("eb558e9f-1c39-460e-8860-71af6af63bd6");
         assertEquals("eb558e9f-1c39-460e-8860-71af6af63bd6", savedProduct.getId());
         assertEquals("Furniture 1", savedProduct.getProductName());
@@ -109,10 +104,7 @@ public class ProductServiceTest {
 
     @Test
     void testGetProductByIdNotFound(){
-        when(productRepository.existsById("0000")).thenReturn(false);
-
         assertNull(service.getProductById("0000"));
-        verify(productRepository,times(1)).existsById("0000");
     }
 
     @Test
@@ -127,8 +119,7 @@ public class ProductServiceTest {
         product1.setDiscPrice(2000000);
 
         when(productRepository.save(product1)).thenReturn(product1);
-        when(productRepository.existsById("eb558e9f-1c39-460e-8860-71af6af63bd6")).thenReturn(true);
-        Product result = service.edit(product1);
+        Product result = service.save(product1);
 
         verify(productRepository,times(1)).save(product1);
         assertEquals(product1.getId(), result.getId());
@@ -142,17 +133,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void testEditIfIdNotFound(){
-        Product product = new Product();
-        product.setId("11111");
-        when(productRepository.existsById("11111")).thenReturn(false);
-
-        assertNull(service.edit(product));
-        verify(productRepository, times(1)).existsById("11111");
-    }
-
-    @Test
-    void testFilterByLowestPriceIfAmountBigger(){
+    void testFilterByLowestPriceIfAmountBigger() throws ExecutionException, InterruptedException {
         Product product2 = new Product();
         product2.setRealPrice(1000000);
 
@@ -162,7 +143,7 @@ public class ProductServiceTest {
         List<Product> products = Arrays.asList(product1, product2, product3);
         when(productRepository.findAll()).thenReturn(products);
 
-        List<Product> result = service.getProductsByPrice(10, true);
+        List<Product> result = service.getProductsByPrice(10, true).get();
 
         assertNotNull(result);
         assertEquals(3, result.size());
@@ -171,7 +152,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void testFilterByHighestPriceIfAmountBigger(){
+    void testFilterByHighestPriceIfAmountBigger() throws ExecutionException, InterruptedException {
         Product product2 = new Product();
         product2.setRealPrice(1000000);
 
@@ -181,7 +162,7 @@ public class ProductServiceTest {
         List<Product> products = Arrays.asList(product1, product2, product3);
         when(productRepository.findAll()).thenReturn(products);
 
-        List<Product> result = service.getProductsByPrice(10, false);
+        List<Product> result = service.getProductsByPrice(10, false).get();
 
         assertNotNull(result);
         assertEquals(3, result.size());
@@ -190,7 +171,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void testFilterLowestPriceIfAmountSmaller() {
+    void testFilterLowestPriceIfAmountSmaller() throws ExecutionException, InterruptedException {
         Product product2 = new Product();
         product2.setRealPrice(1000000);
 
@@ -225,7 +206,7 @@ public class ProductServiceTest {
                 product4, product5, product6, product7, product8, product9, product10, product11);
         when(productRepository.findAll()).thenReturn(products);
 
-        List<Product> result = service.getProductsByPrice(8, true);
+        List<Product> result = service.getProductsByPrice(8, true).get();
         assertEquals(8, result.size());
         assertEquals(900000, result.getFirst().getRealPrice());
         assertEquals(1000000, result.get(1).getRealPrice());
@@ -233,7 +214,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void testFilterHighestPriceIfAmountSmaller(){
+    void testFilterHighestPriceIfAmountSmaller() throws ExecutionException, InterruptedException {
         Product product2 = new Product();
         product2.setRealPrice(1000000);
 
@@ -268,7 +249,7 @@ public class ProductServiceTest {
                 product4, product5, product6, product7, product8, product9, product10, product11);
         when(productRepository.findAll()).thenReturn(products);
 
-        List<Product> result = service.getProductsByPrice(8, false);
+        List<Product> result = service.getProductsByPrice(8, false).get();
         assertEquals(8, result.size());
         assertEquals(5500000, result.getFirst().getRealPrice());
         assertEquals(5000000, result.get(1).getRealPrice());
@@ -276,7 +257,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void testFilterByLowestSalesIfAmountBigger(){
+    void testFilterByLowestSalesIfAmountBigger() throws ExecutionException, InterruptedException {
         product1.setSales(30);
 
         Product product2 = new Product();
@@ -288,7 +269,7 @@ public class ProductServiceTest {
         List<Product> products = Arrays.asList(product1, product2, product3);
         when(productRepository.findAll()).thenReturn(products);
 
-        List<Product> result = service.getProductsBySales(10, true);
+        List<Product> result = service.getProductsBySales(10, true).get();
 
         assertNotNull(result);
         assertEquals(3, result.size());
@@ -297,7 +278,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void testFilterByHighestSalesIfAmountBigger(){
+    void testFilterByHighestSalesIfAmountBigger() throws ExecutionException, InterruptedException {
         product1.setSales(30);
 
         Product product2 = new Product();
@@ -309,7 +290,7 @@ public class ProductServiceTest {
         List<Product> products = Arrays.asList(product1, product2, product3);
         when(productRepository.findAll()).thenReturn(products);
 
-        List<Product> result = service.getProductsBySales(10, false);
+        List<Product> result = service.getProductsBySales(10, false).get();
 
         assertNotNull(result);
         assertEquals(3, result.size());
@@ -318,7 +299,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void testFilterByHighestSalesIfAmountSmaller(){
+    void testFilterByHighestSalesIfAmountSmaller() throws ExecutionException, InterruptedException {
         product1.setSales(30);
 
         Product product2 = new Product();
@@ -336,7 +317,7 @@ public class ProductServiceTest {
         List<Product> products = Arrays.asList(product1, product2, product3, product4, product5);
         when(productRepository.findAll()).thenReturn(products);
 
-        List<Product> result = service.getProductsBySales(3, false);
+        List<Product> result = service.getProductsBySales(3, false).get();
 
         assertNotNull(result);
         assertEquals(3, result.size());
@@ -345,7 +326,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void testFilterByLowestSalesIfAmountSmaller(){
+    void testFilterByLowestSalesIfAmountSmaller() throws ExecutionException, InterruptedException {
         product1.setSales(30);
 
         Product product2 = new Product();
@@ -363,7 +344,7 @@ public class ProductServiceTest {
         List<Product> products = Arrays.asList(product1, product2, product3, product4, product5);
         when(productRepository.findAll()).thenReturn(products);
 
-        List<Product> result = service.getProductsBySales(3, true);
+        List<Product> result = service.getProductsBySales(3, true).get();
 
         assertNotNull(result);
         assertEquals(3, result.size());
@@ -372,25 +353,25 @@ public class ProductServiceTest {
     }
 
    @Test
-   void testFilterIfEmpty(){
+   void testFilterIfEmpty() throws ExecutionException, InterruptedException {
        when(productRepository.findAll()).thenReturn(new ArrayList<Product>());
-       List<Product> result = service.getProductsByPrice(10, false);
+       List<Product> result = service.getProductsByPrice(10, false).get();
 
        assertNotNull(result);
        assertEquals(0, result.size());
    }
 
    @Test
-   void testSearchIfEmpty(){
+   void testSearchIfEmpty() throws ExecutionException, InterruptedException {
        when(productRepository.findByProductNameContainingIgnoreCase("Test")).thenReturn(new ArrayList<Product>());
-       List<Product> result = service.getProductsBySearched(10, false, "Test");
+       List<Product> result = service.getProductsBySearched(10, false, "Test").get();
 
        assertNotNull(result);
        assertEquals(0, result.size());
    }
 
    @Test
-   void testSearchedKeywordNotEmptyAscending() {
+   void testSearchedKeywordNotEmptyAscending() throws ExecutionException, InterruptedException {
        Product searchedProduct1 = new Product();
        searchedProduct1.setProductName("Furry 1");
 
@@ -403,7 +384,7 @@ public class ProductServiceTest {
        List<Product> products = Arrays.asList(searchedProduct2, searchedProduct1, searchedProduct3);
        when(productRepository.findByProductNameContainingIgnoreCase("Furry")).thenReturn(products);
 
-       List<Product> result = service.getProductsBySearched(3, true, "Furry");
+       List<Product> result = service.getProductsBySearched(3, true, "Furry").get();
 
        assertEquals(3, result.size());
        assertEquals("Furry 1", result.getFirst().getProductName());
@@ -411,7 +392,7 @@ public class ProductServiceTest {
        assertEquals("Furry 3", result.getLast().getProductName());
    }
 
-    void testSearchedKeywordNotEmptyDescending() {
+    void testSearchedKeywordNotEmptyDescending() throws ExecutionException, InterruptedException {
         Product searchedProduct1 = new Product();
         searchedProduct1.setProductName("Furry 1");
 
@@ -424,7 +405,7 @@ public class ProductServiceTest {
         List<Product> products = Arrays.asList(searchedProduct2, searchedProduct1, searchedProduct3);
         when(productRepository.findByProductNameContainingIgnoreCase("Furry")).thenReturn(products);
 
-        List<Product> result = service.getProductsBySearched(3, false, "Furry");
+        List<Product> result = service.getProductsBySearched(3, false, "Furry").get();
 
         assertEquals(3, result.size());
         assertEquals("Furry 3", result.getFirst().getProductName());
@@ -433,7 +414,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void testFilterByTagAscending() {
+    void testFilterByTagAscending() throws ExecutionException, InterruptedException {
         Product taggedProduct1 = new Product();
         List<String> tag1 = Arrays.asList("vintage", "white", "indoor");
         taggedProduct1.setProductName("Product1");
@@ -447,7 +428,7 @@ public class ProductServiceTest {
         List<Product> products = Arrays.asList(taggedProduct1, taggedProduct2);
         when(productRepository.findAll()).thenReturn(products);
 
-        List<Product> result = service.getProductsByTag(2, true);
+        List<Product> result = service.getProductsByTag(2, true).get();
         assertEquals(2, result.size());
         assertEquals("Product1", result.getFirst().getProductName());
         assertEquals("Product2", result.get(1).getProductName());
@@ -455,7 +436,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void testFilterByTagDescending() {
+    void testFilterByTagDescending() throws ExecutionException, InterruptedException {
         Product taggedProduct1 = new Product();
         List<String> tag1 = Arrays.asList("vintage", "white", "indoor");
         taggedProduct1.setProductName("Product1");
@@ -469,10 +450,43 @@ public class ProductServiceTest {
         List<Product> products = Arrays.asList(taggedProduct1, taggedProduct2);
         when(productRepository.findAll()).thenReturn(products);
 
-        List<Product> result = service.getProductsByTag(2, false);
+        List<Product> result = service.getProductsByTag(2, false).get();
         assertEquals(2, result.size());
         assertEquals("Product2", result.getFirst().getProductName());
         assertEquals("Product1", result.get(1).getProductName());
 
+    }
+
+    @Test
+    void testIncrementSalesSuccess() throws ExecutionException, InterruptedException {
+        HashMap<String, Integer> productsSold = new HashMap<>();
+        productsSold.put("ABC123", 10);
+        productsSold.put("123ABC", 20);
+        when(productRepository.incrementSales(anyString(), anyInt())).thenReturn(1);
+
+        CompletableFuture<String> future = service.incrementSales(productsSold);
+        String result = future.get();
+
+        verify(productRepository, times(2)).incrementSales(anyString(), anyInt());
+        assertTrue(result.contains("success"));
+    }
+
+    @Test
+    void testIncrementSalesFailed() {
+        HashMap<String, Integer> productsSold = new HashMap<>();
+        productsSold.put("ABC123", 10);
+        productsSold.put("123ABC", 20);
+        when(productRepository.incrementSales(anyString(), anyInt())).thenReturn(0);
+
+        CompletableFuture<String> future = service.incrementSales(productsSold);
+
+        try {
+            future.get();
+        } catch (ExecutionException e) {
+            assertInstanceOf(IllegalArgumentException.class, e.getCause());
+            assertTrue(e.getCause().getMessage().contains("Error"));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

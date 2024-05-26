@@ -1,6 +1,7 @@
 package id.ac.ui.cs.advprog.hoomgroombeadmin.controller;
 
 import id.ac.ui.cs.advprog.hoomgroombeadmin.model.PromoCode;
+import id.ac.ui.cs.advprog.hoomgroombeadmin.service.JwtService;
 import id.ac.ui.cs.advprog.hoomgroombeadmin.service.PromoCodeService;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -24,7 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
-public class PromoCodeControllerTest {
+class PromoCodeControllerTest {
     private MockMvc mvc;
 
     @InjectMocks
@@ -32,6 +33,9 @@ public class PromoCodeControllerTest {
 
     @Mock
     private PromoCodeService service;
+
+    @Mock
+    private JwtService jwtService;
 
     PromoCode promoCode1;
 
@@ -45,10 +49,13 @@ public class PromoCodeControllerTest {
     }
 
     @Test
-    public void createPromoCodeTest() throws Exception {
-        when(service.create(any(PromoCode.class))).thenReturn(promoCode1);
+    void createPromoCodeTest() throws Exception {
+        when(service.save(any(PromoCode.class))).thenReturn(promoCode1);
+        when(jwtService.isTokenValid(anyString())).thenReturn(true);
+        when(jwtService.extractRole(anyString())).thenReturn("ADMIN");
 
         mvc.perform(post("/admin/promo-code/create").contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer jwtToken")
                         .content("{\"id\":\"6e282868-9b5b-48a2-b509-0db4aa3615e6\",\"codeName\":\"BELANJA45\",\"minimumPayment\":90000.0,\"endDate\":[2024,12,31],\"description\":\"bagus\",\"discPercentage\":45}"))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -62,15 +69,46 @@ public class PromoCodeControllerTest {
                     assertTrue(jsonObject.has("codeName"));
                     assertTrue(jsonObject.has("description"));
                 });
-        verify(service, times(1)).create(any(PromoCode.class));
+        verify(service, times(1)).save(any(PromoCode.class));
+        verify(jwtService, times(1)).isTokenValid(anyString());
+        verify(jwtService, times(1)).extractRole(anyString());
     }
 
     @Test
-    public void updatePromoCodePostTest() throws Exception {
-        when(service.edit(any(PromoCode.class))).thenReturn(promoCode1);
+    void createPromoCodeNotAdminTest() throws Exception {
+        when(jwtService.isTokenValid(anyString())).thenReturn(true);
+        when(jwtService.extractRole(anyString())).thenReturn("USER");
+
+        mvc.perform(post("/admin/promo-code/create").contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer jwtToken")
+                        .content("{\"id\":\"6e282868-9b5b-48a2-b509-0db4aa3615e6\",\"codeName\":\"BELANJA45\",\"minimumPayment\":90000.0,\"endDate\":[2024,12,31],\"description\":\"bagus\",\"discPercentage\":45}"))
+                .andExpect(status().isForbidden());
+
+        verify(jwtService, times(1)).isTokenValid(anyString());
+        verify(jwtService, times(1)).extractRole(anyString());
+    }
+
+    @Test
+    void createPromoCodeNotLoggedInTest() throws Exception {
+        when(jwtService.isTokenValid(anyString())).thenReturn(false);
+
+        mvc.perform(post("/admin/promo-code/create").contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer jwtToken")
+                        .content("{\"id\":\"6e282868-9b5b-48a2-b509-0db4aa3615e6\",\"codeName\":\"BELANJA45\",\"minimumPayment\":90000.0,\"endDate\":[2024,12,31],\"description\":\"bagus\",\"discPercentage\":45}"))
+                .andExpect(status().isForbidden());
+
+        verify(jwtService, times(1)).isTokenValid(anyString());
+    }
+
+    @Test
+    void updatePromoCodePostTest() throws Exception {
+        when(service.save(any(PromoCode.class))).thenReturn(promoCode1);
+        when(jwtService.isTokenValid(anyString())).thenReturn(true);
+        when(jwtService.extractRole(anyString())).thenReturn("ADMIN");
 
         mvc.perform(post("/admin/promo-code/update/save")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer jwtToken")
                         .content("{\"id\":\"6e282868-9b5b-48a2-b509-0db4aa3615e6\",\"codeName\":\"diskonn45\",\"minimumPayment\":90000.0,\"endDate\":[2024,12,31],\"description\":\"bagus\",\"discPercentage\":45}"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -84,17 +122,48 @@ public class PromoCodeControllerTest {
                     assertTrue(jsonObject.has("codeName"));
                     assertTrue(jsonObject.has("description"));
                 });
-        verify(service, times(1)).edit(any(PromoCode.class));
+        verify(service, times(1)).save(any(PromoCode.class));
+        verify(jwtService, times(1)).isTokenValid(anyString());
+        verify(jwtService, times(1)).extractRole(anyString());
     }
 
     @Test
-    public void updatePromoCodePageTest() throws Exception {
+    void updatePromoCodePostNotAdminTest() throws Exception {
+        when(jwtService.isTokenValid(anyString())).thenReturn(true);
+        when(jwtService.extractRole(anyString())).thenReturn("USER");
+
+        mvc.perform(post("/admin/promo-code/update/save")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer jwtToken")
+                        .content("{\"id\":\"6e282868-9b5b-48a2-b509-0db4aa3615e6\",\"codeName\":\"diskonn45\",\"minimumPayment\":90000.0,\"endDate\":[2024,12,31],\"description\":\"bagus\",\"discPercentage\":45}"))
+                .andExpect(status().isForbidden());
+        verify(jwtService, times(1)).isTokenValid(anyString());
+        verify(jwtService, times(1)).extractRole(anyString());
+    }
+
+    @Test
+    void updatePromoCodePostNotLoggedInTest() throws Exception {
+        when(jwtService.isTokenValid(anyString())).thenReturn(false);
+
+        mvc.perform(post("/admin/promo-code/update/save")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer jwtToken")
+                        .content("{\"id\":\"6e282868-9b5b-48a2-b509-0db4aa3615e6\",\"codeName\":\"diskonn45\",\"minimumPayment\":90000.0,\"endDate\":[2024,12,31],\"description\":\"bagus\",\"discPercentage\":45}"))
+                .andExpect(status().isForbidden());
+        verify(jwtService, times(1)).isTokenValid(anyString());
+    }
+
+    @Test
+    void updatePromoCodePageTest() throws Exception {
         UUID promoCodeId = new UUID(32, 10);
         promoCode1.setCodeId(promoCodeId.toString());
         promoCode1.setCodeName("Belanja55");
         when(service.getPromoCodeById(promoCodeId.toString())).thenReturn(promoCode1);
+        when(jwtService.isTokenValid(anyString())).thenReturn(true);
+        when(jwtService.extractRole(anyString())).thenReturn("ADMIN");
 
-        mvc.perform(get("/admin/promo-code/update/" + promoCodeId.toString()))
+        mvc.perform(get("/admin/promo-code/update/" + promoCodeId.toString())
+                        .header("Authorization", "Bearer jwtToken"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andDo(result -> {
@@ -108,28 +177,103 @@ public class PromoCodeControllerTest {
                     assertTrue(jsonObject.has("description"));
                 });
         verify(service, times(1)).getPromoCodeById(promoCodeId.toString());
+        verify(jwtService, times(1)).isTokenValid(anyString());
+        verify(jwtService, times(1)).extractRole(anyString());
     }
 
     @Test
-    public void deletePromoCodeTest() throws Exception {
+    void updatePromoCodePageIdNotFoundTest() throws Exception {
+        when(service.getPromoCodeById(anyString())).thenReturn(null);
+        when(jwtService.isTokenValid(anyString())).thenReturn(true);
+        when(jwtService.extractRole(anyString())).thenReturn("ADMIN");
+
+        mvc.perform(get("/admin/promo-code/update/" + "ABC123")
+                        .header("Authorization", "Bearer jwtToken"))
+                .andExpect(status().isBadRequest());
+
+        verify(service, times(1)).getPromoCodeById(anyString());
+        verify(jwtService, times(1)).isTokenValid(anyString());
+        verify(jwtService, times(1)).extractRole(anyString());
+    }
+
+    @Test
+    void updatePromoCodePageNotAdminTest() throws Exception {
+        when(jwtService.isTokenValid(anyString())).thenReturn(true);
+        when(jwtService.extractRole(anyString())).thenReturn("USER");
+
+        mvc.perform(get("/admin/promo-code/update/" + "ABC123")
+                        .header("Authorization", "Bearer jwtToken"))
+                .andExpect(status().isForbidden());
+
+        verify(jwtService, times(1)).isTokenValid(anyString());
+        verify(jwtService, times(1)).extractRole(anyString());
+    }
+
+    @Test
+    void updatePromoCodePageNotLoggedInTest() throws Exception {
+        when(jwtService.isTokenValid(anyString())).thenReturn(false);
+
+        mvc.perform(get("/admin/promo-code/update/" + "ABC123")
+                        .header("Authorization", "Bearer jwtToken"))
+                .andExpect(status().isForbidden());
+
+        verify(jwtService, times(1)).isTokenValid(anyString());
+    }
+
+    @Test
+    void deletePromoCodeTest() throws Exception {
         UUID promoCodeId = new UUID(32, 10);
         String expectedResult = "Deleted promo code with ID " + promoCodeId;
         when(service.delete(promoCodeId.toString())).thenReturn(promoCodeId.toString());
+        when(jwtService.isTokenValid(anyString())).thenReturn(true);
+        when(jwtService.extractRole(anyString())).thenReturn("ADMIN");
 
-        mvc.perform(delete("/admin/promo-code/delete/" + promoCodeId.toString()))
+        mvc.perform(delete("/admin/promo-code/delete/" + promoCodeId.toString())
+                        .header("Authorization", "Bearer jwtToken"))
                 .andExpect(status().isOk())
                 .andDo(result -> {String responseBody = result.getResponse().getContentAsString();
                 assertEquals(expectedResult, responseBody);
                 });
         verify(service, times(1)).delete(promoCodeId.toString());
+        verify(jwtService, times(1)).isTokenValid(anyString());
+        verify(jwtService, times(1)).extractRole(anyString());
     }
 
     @Test
-    public void listPromoCodeTest() throws Exception {
+    void deletePromoCodeNotAdminTest() throws Exception {
+        UUID promoCodeId = new UUID(32, 10);
+        when(jwtService.isTokenValid(anyString())).thenReturn(true);
+        when(jwtService.extractRole(anyString())).thenReturn("USER");
+
+        mvc.perform(delete("/admin/promo-code/delete/" + promoCodeId.toString())
+                        .header("Authorization", "Bearer jwtToken"))
+                .andExpect(status().isForbidden());
+
+        verify(jwtService, times(1)).isTokenValid(anyString());
+        verify(jwtService, times(1)).extractRole(anyString());
+    }
+
+    @Test
+    void deletePromoCodeNotLoggedInTest() throws Exception {
+        UUID promoCodeId = new UUID(32, 10);
+        when(jwtService.isTokenValid(anyString())).thenReturn(false);
+
+        mvc.perform(delete("/admin/promo-code/delete/" + promoCodeId.toString())
+                        .header("Authorization", "Bearer jwtToken"))
+                .andExpect(status().isForbidden());
+
+        verify(jwtService, times(1)).isTokenValid(anyString());
+    }
+
+    @Test
+    void listPromoCodeTest() throws Exception {
         promoCode1.setCodeName("belanjaaa99");
         when(service.getAll()).thenReturn(Arrays.asList(promoCode1));
+        when(jwtService.isTokenValid(anyString())).thenReturn(true);
+        when(jwtService.extractRole(anyString())).thenReturn("ADMIN");
 
-        mvc.perform(get("/admin/promo-code/manage"))
+        mvc.perform(get("/admin/promo-code/manage")
+                        .header("Authorization", "Bearer jwtToken"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andDo(result -> {
@@ -144,5 +288,31 @@ public class PromoCodeControllerTest {
                     assertTrue(jsonObject.has("description"));
                 });
         verify(service, times(1)).getAll();
+        verify(jwtService, times(1)).isTokenValid(anyString());
+        verify(jwtService, times(1)).extractRole(anyString());
+    }
+
+    @Test
+    void listPromoCodeNotAdminTest() throws Exception {
+        when(jwtService.isTokenValid(anyString())).thenReturn(true);
+        when(jwtService.extractRole(anyString())).thenReturn("USER");
+
+        mvc.perform(get("/admin/promo-code/manage")
+                        .header("Authorization", "Bearer jwtToken"))
+                .andExpect(status().isForbidden());
+
+        verify(jwtService, times(1)).isTokenValid(anyString());
+        verify(jwtService, times(1)).extractRole(anyString());
+    }
+
+    @Test
+    void listPromoCodeNotLoggedInTest() throws Exception {
+        when(jwtService.isTokenValid(anyString())).thenReturn(false);
+
+        mvc.perform(get("/admin/promo-code/manage")
+                        .header("Authorization", "Bearer jwtToken"))
+                .andExpect(status().isForbidden());
+
+        verify(jwtService, times(1)).isTokenValid(anyString());
     }
 }

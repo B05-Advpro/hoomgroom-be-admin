@@ -6,8 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -31,13 +29,13 @@ public class PromoCode {
 
     public PromoCode(String codeName, LocalDate endDate, String description, Double minimumPayment){
         if (!isAlphaNumeric(codeName)){
-            throw new IllegalArgumentException("Nama kode promo tidak valid.");
+            throw new IllegalArgumentException("Promo code name must be alphanumeric!");
         }
         if (!isValidEndDate(endDate)){
-            throw new IllegalArgumentException("Tanggal kode promo berakhir tidak bisa sebelum tanggal saat ini.");
+            throw new IllegalArgumentException("The promo code expired date must be in the future!");
         }
         if (minimumPayment < 1){
-            throw new IllegalArgumentException("Minimal transaksi harus lebih dari 0!");
+            throw new IllegalArgumentException("The minimum transaction must be bigger than 0!");
         }
 
         this.codeId = new UUID(32, 10).toString();
@@ -71,27 +69,27 @@ public class PromoCode {
 
     public void setEndDate(LocalDate endDate) {
         if (endDate.isBefore(LocalDate.now())){
-            throw new IllegalArgumentException("Tanggal kode promo berakhir tidak bisa sebelum tanggal saat ini.");
+            throw new IllegalArgumentException("The promo code expired date must be in the future!");
         }
         this.endDate = endDate;
     }
 
     public void setMinimumPayment(Double minimumPayment){
         if (minimumPayment < 1){
-            throw new IllegalArgumentException("Minimal transaksi harus lebih dari 0!");
+            throw new IllegalArgumentException("The minimum transaction must be bigger than 0!");
         }
         this.minimumPayment = minimumPayment;
     }
 
     public void setCodeName(String name){
         if (!isAlphaNumeric(name)){
-            throw new IllegalArgumentException("Nama kode promo tidak valid.");
+            throw new IllegalArgumentException("Promo code name must be alphanumeric!");
         }
         this.codeName = name.toUpperCase();
     }
 
     public void setCodeId(String id) throws IllegalArgumentException{
-        UUID uuid = UUID.fromString(id);
+        UUID.fromString(id);
         this.codeId = id;
     }
 }
