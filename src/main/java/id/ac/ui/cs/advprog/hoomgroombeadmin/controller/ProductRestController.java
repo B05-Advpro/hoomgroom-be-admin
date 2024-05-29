@@ -47,11 +47,7 @@ public class ProductRestController {
     }
 
     @GetMapping("/update/{productId}")
-    public ResponseEntity<Product> updateProductPage(@RequestHeader (value = "Authorization") String token, @PathVariable String productId){
-        token = token.substring(7);
-        if (!jwtService.isTokenValid(token)){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+    public ResponseEntity<Product> updateProductPage(@PathVariable String productId){
         Product result = service.getProductById(productId);
         if (result == null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
