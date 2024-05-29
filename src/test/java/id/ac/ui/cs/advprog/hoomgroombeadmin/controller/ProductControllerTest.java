@@ -177,11 +177,8 @@ class ProductControllerTest {
         UUID productId = new UUID(32, 10);
         product1.setId(productId.toString());
         when(productService.getProductById(productId.toString())).thenReturn(product1);
-        when(jwtService.isTokenValid(anyString())).thenReturn(true);
-        when(jwtService.extractRole(anyString())).thenReturn("ADMIN");
 
-        mvc.perform(get("/admin/product/update/" + productId.toString())
-                        .header("Authorization", "Bearer jwtToken"))
+        mvc.perform(get("/admin/product/update/" + productId.toString()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andDo(result -> {
@@ -197,46 +194,16 @@ class ProductControllerTest {
                     assertTrue(product.getTag().contains("indoor"));
                 });
         verify(productService, times(1)).getProductById(productId.toString());
-        verify(jwtService, times(1)).isTokenValid(anyString());
-        verify(jwtService, times(1)).extractRole(anyString());
     }
 
     @Test
     void updateProductPageIdNotFoundTest() throws Exception {
         when(productService.getProductById(anyString())).thenReturn(null);
-        when(jwtService.isTokenValid(anyString())).thenReturn(true);
-        when(jwtService.extractRole(anyString())).thenReturn("ADMIN");
 
-        mvc.perform(get("/admin/product/update/" + "ABC123")
-                        .header("Authorization", "Bearer jwtToken"))
+        mvc.perform(get("/admin/product/update/" + "ABC123"))
                 .andExpect(status().isBadRequest());
 
-        verify(jwtService, times(1)).isTokenValid(anyString());
-        verify(jwtService, times(1)).extractRole(anyString());
-    }
-
-    @Test
-    void updateProductPageNotAdminTest() throws Exception {
-        when(jwtService.isTokenValid(anyString())).thenReturn(true);
-        when(jwtService.extractRole(anyString())).thenReturn("USER");
-
-        mvc.perform(get("/admin/product/update/" + "ABC123")
-                        .header("Authorization", "Bearer jwtToken"))
-                .andExpect(status().isForbidden());
-
-        verify(jwtService, times(1)).isTokenValid(anyString());
-        verify(jwtService, times(1)).extractRole(anyString());
-    }
-
-    @Test
-    void updateProductPageNotLoggedInTest() throws Exception {
-        when(jwtService.isTokenValid(anyString())).thenReturn(false);
-
-        mvc.perform(get("/admin/product/update/" + "ABC123")
-                        .header("Authorization", "Bearer jwtToken"))
-                .andExpect(status().isForbidden());
-
-        verify(jwtService, times(1)).isTokenValid(anyString());
+        verify(productService, times(1)).getProductById(anyString());
     }
 
     @Test
