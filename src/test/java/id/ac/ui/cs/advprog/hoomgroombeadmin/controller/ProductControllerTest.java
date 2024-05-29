@@ -206,7 +206,7 @@ class ProductControllerTest {
     }
 
     @Test
-    public void deleteProductTest() throws Exception {
+    void deleteProductTest() throws Exception {
         UUID productId = new UUID(32, 10);
         String expectedResult = "Deleted product with ID " + productId;
         when(productService.delete(productId.toString())).thenReturn(CompletableFuture.completedFuture(productId.toString()));
@@ -252,7 +252,7 @@ class ProductControllerTest {
     }
 
     @Test
-    public void listProductTest() throws Exception {
+    void listProductTest() throws Exception {
         List<Product> prod = Arrays.asList(product1);
         when(productService.getAll()).thenReturn(CompletableFuture.completedFuture(prod));
         mvc.perform(get("/admin/product/list"))
