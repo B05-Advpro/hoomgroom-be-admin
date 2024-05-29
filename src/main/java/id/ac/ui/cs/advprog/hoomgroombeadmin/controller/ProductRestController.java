@@ -71,12 +71,6 @@ public class ProductRestController {
         return new ResponseEntity<>(result.get(), HttpStatus.OK);
     }
 
-    @GetMapping("/filter?sortby=")
-    public ResponseEntity<List<Product>> listProductByTag() throws ExecutionException, InterruptedException{
-        CompletableFuture<List<Product>> result = service.getAll();
-        return new ResponseEntity<>(result.get(), HttpStatus.OK);
-    }
-
     @GetMapping("/filter")
     public ResponseEntity<List<Product>> filterProducts(
             @RequestParam String filterType,
