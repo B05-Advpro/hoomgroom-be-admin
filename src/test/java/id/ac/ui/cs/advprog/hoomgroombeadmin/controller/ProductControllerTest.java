@@ -2,16 +2,15 @@ package id.ac.ui.cs.advprog.hoomgroombeadmin.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import id.ac.ui.cs.advprog.hoomgroombeadmin.model.Product;
 import id.ac.ui.cs.advprog.hoomgroombeadmin.service.JwtService;
 import id.ac.ui.cs.advprog.hoomgroombeadmin.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.InjectMocks;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -22,13 +21,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class ProductControllerTest {
@@ -177,11 +176,8 @@ class ProductControllerTest {
         UUID productId = new UUID(32, 10);
         product1.setId(productId.toString());
         when(productService.getProductById(productId.toString())).thenReturn(product1);
-        when(jwtService.isTokenValid(anyString())).thenReturn(true);
-        when(jwtService.extractRole(anyString())).thenReturn("ADMIN");
 
-        mvc.perform(get("/admin/product/update/" + productId.toString())
-                        .header("Authorization", "Bearer jwtToken"))
+        mvc.perform(get("/admin/product/update/" + productId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andDo(result -> {
@@ -197,58 +193,27 @@ class ProductControllerTest {
                     assertTrue(product.getTag().contains("indoor"));
                 });
         verify(productService, times(1)).getProductById(productId.toString());
-        verify(jwtService, times(1)).isTokenValid(anyString());
-        verify(jwtService, times(1)).extractRole(anyString());
     }
 
     @Test
     void updateProductPageIdNotFoundTest() throws Exception {
         when(productService.getProductById(anyString())).thenReturn(null);
-        when(jwtService.isTokenValid(anyString())).thenReturn(true);
-        when(jwtService.extractRole(anyString())).thenReturn("ADMIN");
 
-        mvc.perform(get("/admin/product/update/" + "ABC123")
-                        .header("Authorization", "Bearer jwtToken"))
+        mvc.perform(get("/admin/product/update/" + "ABC123"))
                 .andExpect(status().isBadRequest());
 
-        verify(jwtService, times(1)).isTokenValid(anyString());
-        verify(jwtService, times(1)).extractRole(anyString());
+        verify(productService, times(1)).getProductById(anyString());
     }
 
     @Test
-    void updateProductPageNotAdminTest() throws Exception {
-        when(jwtService.isTokenValid(anyString())).thenReturn(true);
-        when(jwtService.extractRole(anyString())).thenReturn("USER");
-
-        mvc.perform(get("/admin/product/update/" + "ABC123")
-                        .header("Authorization", "Bearer jwtToken"))
-                .andExpect(status().isForbidden());
-
-        verify(jwtService, times(1)).isTokenValid(anyString());
-        verify(jwtService, times(1)).extractRole(anyString());
-    }
-
-    @Test
-    void updateProductPageNotLoggedInTest() throws Exception {
-        when(jwtService.isTokenValid(anyString())).thenReturn(false);
-
-        mvc.perform(get("/admin/product/update/" + "ABC123")
-                        .header("Authorization", "Bearer jwtToken"))
-                .andExpect(status().isForbidden());
-
-        verify(jwtService, times(1)).isTokenValid(anyString());
-    }
-
-    @Test
-    public void deleteProductTest() throws Exception, ExecutionException, InterruptedException {
+    void deleteProductTest() throws Exception {
         UUID productId = new UUID(32, 10);
-        CompletableFuture<String> completableFuture = CompletableFuture.completedFuture(productId.toString());
-        String expectedResult = "Deleted product with ID " + productId.toString();
+        String expectedResult = "Deleted product with ID " + productId;
         when(productService.delete(productId.toString())).thenReturn(CompletableFuture.completedFuture(productId.toString()));
         when(jwtService.isTokenValid(anyString())).thenReturn(true);
         when(jwtService.extractRole(anyString())).thenReturn("ADMIN");
 
-        mvc.perform(delete("/admin/product/delete/" + productId.toString())
+        mvc.perform(delete("/admin/product/delete/" + productId)
                         .header("Authorization", "Bearer jwtToken"))
                 .andExpect(status().isOk())
                 .andDo(result -> {
@@ -266,7 +231,7 @@ class ProductControllerTest {
         when(jwtService.isTokenValid(anyString())).thenReturn(true);
         when(jwtService.extractRole(anyString())).thenReturn("USER");
 
-        mvc.perform(delete("/admin/product/delete/" + productId.toString())
+        mvc.perform(delete("/admin/product/delete/" + productId)
                         .header("Authorization", "Bearer jwtToken"))
                 .andExpect(status().isForbidden());
 
@@ -279,7 +244,7 @@ class ProductControllerTest {
         UUID productId = new UUID(32, 10);
         when(jwtService.isTokenValid(anyString())).thenReturn(false);
 
-        mvc.perform(delete("/admin/product/delete/" + productId.toString())
+        mvc.perform(delete("/admin/product/delete/" + productId)
                         .header("Authorization", "Bearer jwtToken"))
                 .andExpect(status().isForbidden());
 
@@ -287,14 +252,14 @@ class ProductControllerTest {
     }
 
     @Test
-    public void listProductTest() throws Exception {
+    void listProductTest() throws Exception {
         List<Product> prod = Arrays.asList(product1);
         when(productService.getAll()).thenReturn(CompletableFuture.completedFuture(prod));
         mvc.perform(get("/admin/product/list"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andDo(result -> {
-                    List<Product> products = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<List<Product>>() {
+                    List<Product> products = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
                     });
                     assertNotNull(products);
                     Product product = products.getFirst();

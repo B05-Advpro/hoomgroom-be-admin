@@ -17,7 +17,7 @@ public class Product {
     private String id;
     private String productName;
 
-    @ElementCollection(targetClass = String.class)
+    @ElementCollection(fetch = FetchType.EAGER, targetClass = String.class)
     @CollectionTable(name = "tags", joinColumns = @JoinColumn(name = "product_id"))
     @Column(name = "tag", nullable = false)
     private List<String> tag;
